@@ -1,9 +1,10 @@
 /* Cementos San Marcos — componentes compartidos */
 import React from "react";
 import { Icon } from "@/components/icons";
-import { PROD_CATS, prodCat } from "@/lib/prodThumb";
+import { PROD_CATS, prodCat, type ProdLike } from "@/lib/prodThumb";
+import type { PillKind } from "@/lib/data";
 
-export function MLogo({ size = 21 }) {
+export function MLogo({ size = 21 }: { size?: number }) {
   // Marca: saco/montaña estilizada
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
@@ -13,15 +14,15 @@ export function MLogo({ size = 21 }) {
   );
 }
 
-export function Pill({ kind, children, dot = true }) {
+export function Pill({ kind, children, dot = true }: { kind: PillKind; children: React.ReactNode; dot?: boolean }) {
   return <span className={"pill " + kind}>{dot && <span className="dt" />}{children}</span>;
 }
 
-export function Checkbox({ on, onClick }) {
+export function Checkbox({ on, onClick }: { on: boolean; onClick: () => void }) {
   return <div className={"checkbox" + (on ? " on" : "")} onClick={onClick}><Icon.check /></div>;
 }
 
-export function ProdThumb({ prod, size = 44 }) {
+export function ProdThumb({ prod, size = 44 }: { prod: ProdLike; size?: number }) {
   const cat = PROD_CATS[prodCat(prod)];
   const Ic = Icon[cat.icon];
   return (
@@ -33,18 +34,25 @@ export function ProdThumb({ prod, size = 44 }) {
 
 /* Reemplaza al <image-slot> del prototipo: imagen del producto con el
    placeholder SVG por defecto (object-fit cover para llenar el contenedor). */
-export function ProdImg({ src, alt = "", className, style }) {
+export function ProdImg({ src, alt = "", className, style, title }: {
+  src: string;
+  alt?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  title?: string;
+}) {
   return (
     <img
       src={src}
       alt={alt}
+      title={title}
       className={className}
       style={{ objectFit: "cover", display: "block", ...style }}
     />
   );
 }
 
-export function DetalleRow({ label, value, strong }) {
+export function DetalleRow({ label, value, strong }: { label: React.ReactNode; value: React.ReactNode; strong?: boolean }) {
   return (
     <div className="between" style={{ padding: "9px 0", borderBottom: "1px solid var(--line)" }}>
       <span className="t-muted" style={{ fontSize: 13 }}>{label}</span>

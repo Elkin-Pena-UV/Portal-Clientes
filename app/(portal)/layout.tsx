@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { Topbar } from "@/components/Topbar";
@@ -8,7 +8,12 @@ import { Footer } from "@/components/Footer";
 import { Icon } from "@/components/icons";
 import { useAuth } from "@/contexts/auth";
 
-const TITLES = {
+interface TitleMeta {
+  t: string;
+  s: string;
+}
+
+const TITLES: Record<string, TitleMeta> = {
   inicio: { t: "Inicio", s: "Resumen de tu cuenta — Constructora del Pacífico S.A.S." },
   crear: { t: "Crear orden", s: "Registra una nueva orden de compra en 4 pasos" },
   pedidos: { t: "Mis pedidos", s: "Seguimiento e historial de tus órdenes" },
@@ -18,7 +23,7 @@ const TITLES = {
   producto: { t: "Producto", s: "Fichas técnicas del catálogo" },
 };
 
-export default function PortalLayout({ children }) {
+export default function PortalLayout({ children }: { children: ReactNode }) {
   const { authed, ready, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -53,7 +58,7 @@ export default function PortalLayout({ children }) {
     : null;
 
   return (
-    <div className={"app" + (collapsed ? " collapsed" : "")} data-sb="light" style={{ "--dens": 1 }}>
+    <div className={"app" + (collapsed ? " collapsed" : "")} data-sb="light" style={{ "--dens": 1 } as CSSProperties}>
       <Sidebar collapsed={collapsed} onToggle={toggleSidebar} onLogout={handleLogout} />
       <main className="main">
         <Topbar title={meta.t} sub={meta.s} actions={actions} />

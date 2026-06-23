@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/icons";
 import { MP } from "@/lib/data";
@@ -17,7 +17,7 @@ export default function LoginPage() {
     if (ready && authed) router.replace("/inicio");
   }, [ready, authed, router]);
 
-  function submit(e) {
+  function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     login();
     router.replace("/inicio");

@@ -1,14 +1,18 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { Icon } from "@/components/icons";
 
-const ToastCtx = createContext(null);
+interface ToastContextValue {
+  showToast: (m: string) => void;
+}
 
-export function ToastProvider({ children }) {
-  const [msg, setMsg] = useState(null);
+const ToastCtx = createContext<ToastContextValue | null>(null);
 
-  const showToast = useCallback((m) => setMsg(m), []);
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const showToast = useCallback((m: string) => setMsg(m), []);
 
   useEffect(() => {
     if (!msg) return;
@@ -28,7 +32,7 @@ export function ToastProvider({ children }) {
   );
 }
 
-export function useToast() {
+export function useToast(): ToastContextValue {
   const ctx = useContext(ToastCtx);
   if (!ctx) throw new Error("useToast must be used within ToastProvider");
   return ctx;

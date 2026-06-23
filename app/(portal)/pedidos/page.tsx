@@ -2,15 +2,22 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/icons";
-import { MP } from "@/lib/data";
+import { MP, type EstadoPedido } from "@/lib/data";
 import { Pill, DetalleRow } from "@/components/ui";
 
+type FiltroPedido = "todos" | EstadoPedido;
+
 export default function MisPedidosPage() {
-  const [filtro, setFiltro] = useState("todos");
+  const [filtro, setFiltro] = useState<FiltroPedido>("todos");
   const [showFilter, setShowFilter] = useState(false);
+
   const activo = MP.pedidos.find((p) => p.hitos);
-  const entregado = activo.hitos[activo.hitos.length - 1].done;
-  const filtros = [
+  // Con los datos actuales siempre existe un pedido con hitos; el guard mantiene el tipo seguro.
+  if (!activo?.hitos) return null;
+  const hitos = activo.hitos;
+  const entregado = hitos[hitos.length - 1].done;
+
+  const filtros: { id: FiltroPedido; label: string }[] = [
     { id: "todos", label: "Todos" },
     { id: "transito", label: "En tránsito" },
     { id: "entregado", label: "Entregados" },
@@ -32,8 +39,8 @@ export default function MisPedidosPage() {
         <div className="seg-grid">
           <div className="card-pad">
             <div className="timeline">
-              {activo.hitos.map((h, i) => {
-                const last = i === activo.hitos.length - 1;
+              {hitos.map((h, i) => {
+                const last = i === hitos.length - 1;
                 const cls = h.current ? "current" : h.done ? "done" : "pending";
                 return (
                   <div className={"tl-item " + cls} key={h.k}>
@@ -120,8 +127,8 @@ export default function MisPedidosPage() {
   );
 }
 
-function FiltroGeneral({ onClose }) {
-  const campos = [
+function FiltroGeneral({ onClose }: { onClose: () => void }) {
+  const campos: [string, string][] = [
     ["Fecha creación", "rango"], ["Cod", "text"], ["Orden de compra", "text"],
     ["Punto de entrega", "select"], ["Estado", "select"], ["Tipo documento", "select"],
     ["Forma de pago", "select"], ["Moneda", "select"], ["Estado proceso", "select"],

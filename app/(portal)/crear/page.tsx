@@ -1,12 +1,31 @@
 "use client";
 
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useRef, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/icons";
-import { MP } from "@/lib/data";
+import { MP, type Producto } from "@/lib/data";
 import { Checkbox, DetalleRow, ProdImg } from "@/components/ui";
 import { prodThumbSrc, prodThumbSrcLarge } from "@/lib/prodThumb";
 import { useToast } from "@/contexts/toast";
+
+type TipoProd = "saco" | "granel";
+type TipoEnt = "entrega" | "retiro";
+type CartItem = Producto & { qty: number };
+type Cart = Record<string, number>;
+
+interface DatosPaso2 {
+  sede: string;
+  punto: string;
+  dir: string;
+  fecha: string;
+  conductor: string;
+  cc: string;
+  placa: string;
+  celular: string;
+  puntoRetiro: string;
+}
+
+type CampoPaso2 = "conductor" | "cc" | "placa" | "celular" | "puntoRetiro";
 
 export default function CrearOrdenPage() {
   const router = useRouter();
@@ -14,22 +33,22 @@ export default function CrearOrdenPage() {
   const [step, setStep] = useState(1);
 
   // Paso 1 — tipo
-  const [tipoProd, setTipoProd] = useState("saco");   // saco | granel
-  const [tipoEnt, setTipoEnt] = useState("entrega");  // entrega | retiro
+  const [tipoProd, setTipoProd] = useState<TipoProd>("saco");
+  const [tipoEnt, setTipoEnt] = useState<TipoEnt>("entrega");
 
   // Paso 2 — punto de entrega / datos
-  const [d2, setD2] = useState({
+  const [d2, setD2] = useState<DatosPaso2>({
     sede: MP.sedes[0], punto: MP.puntos[0], dir: "Cra 100 # 11-60, Bodega A · Cali",
     fecha: "2026-06-18", conductor: "", cc: "", placa: "", celular: "", puntoRetiro: "",
   });
-  const [touched, setTouched] = useState({});
+  const [touched, setTouched] = useState<Partial<Record<CampoPaso2, boolean>>>({});
 
   // Paso 3 — productos { id: qty }, estibado, adjuntos
-  const [cart, setCart] = useState({ "CEM-UG50": 320, "EST-INT": 60 });
+  const [cart, setCart] = useState<Cart>({ "CEM-UG50": 320, "EST-INT": 60 });
   const [estibado, setEstibado] = useState(false);
   const [descargue, setDescargue] = useState(false);
-  const [bulkFile, setBulkFile] = useState(null);
-  const bulkRef = useRef(null);
+  const [bulkFile, setBulkFile] = useState<string | null>(null);
+  const bulkRef = useRef<HTMLInputElement>(null);
   const [modal, setModal] = useState(false);
 
   const steps = [
@@ -45,7 +64,7 @@ export default function CrearOrdenPage() {
   }
 
   // -------- validación paso 2 --------
-  const e2 = {};
+  const e2: Partial<Record<CampoPaso2, string>> = {};
   if (tipoEnt === "entrega") {
     if (touched.conductor && d2.conductor.trim().length < 3) e2.conductor = "Mínimo 3 caracteres.";
     if (touched.cc && !/^\d{6,12}$/.test(d2.cc)) e2.cc = "Documento entre 6 y 12 dígitos.";
@@ -59,7 +78,13 @@ export default function CrearOrdenPage() {
     : d2.puntoRetiro.trim().length >= 3;
 
   // -------- carrito --------
-  const cartItems = Object.entries(cart).filter(([, q]) => q > 0).map(([id, q]) => ({ ...MP.productos.find((p) => p.id === id), qty: q }));
+  const cartItems: CartItem[] = Object.entries(cart)
+    .filter(([, q]) => q > 0)
+    .map(([id, q]) => {
+      const p = MP.productos.find((prod) => prod.id === id);
+      return p ? { ...p, qty: q } : null;
+    })
+    .filter((it): it is CartItem => it !== null);
   const gravado = cartItems.filter((it) => it.gravado).reduce((s, it) => s + it.precio * it.qty, 0);
   const noGravado = cartItems.filter((it) => !it.gravado).reduce((s, it) => s + it.precio * it.qty, 0);
   const estibCost = estibado ? 120000 : 0;
@@ -98,10 +123,10 @@ export default function CrearOrdenPage() {
         <div className="card card-pad">
           <div className="section-title">Seleccione el tipo de producto</div>
           <div className="choice-row" style={{ marginBottom: 26 }}>
-            {[
+            {([
               { id: "saco", t: "Cemento Saco", d: "Presentaciones ensacadas", ic: "box" },
               { id: "granel", t: "Cemento Granel", d: "Despacho a granel por tonelada", ic: "truck" },
-            ].map((o) => {
+            ] as const).map((o) => {
               const Ic = Icon[o.ic];
               return (
                 <button key={o.id} className={"choice" + (tipoProd === o.id ? " on" : "")} onClick={() => setTipoProd(o.id)}>
@@ -114,10 +139,10 @@ export default function CrearOrdenPage() {
           </div>
           <div className="section-title">Seleccione el tipo de entrega</div>
           <div className="choice-row">
-            {[
+            {([
               { id: "entrega", t: "Entrega", d: "San Marcos despacha a tu obra", ic: "truck" },
               { id: "retiro", t: "Retiro", d: "Retiras en planta con tu vehículo", ic: "pin" },
-            ].map((o) => {
+            ] as const).map((o) => {
               const Ic = Icon[o.ic];
               return (
                 <button key={o.id} className={"choice" + (tipoEnt === o.id ? " on" : "")} onClick={() => setTipoEnt(o.id)}>
@@ -139,8 +164,8 @@ export default function CrearOrdenPage() {
               <button className="btn btn-ghost btn-sm" type="button"><Icon.download /> Descargar plantilla</button>
             </div>
             <input ref={bulkRef} type="file" accept=".xlsx,.xls,.csv,.txt" hidden
-              onChange={(e) => setBulkFile(e.target.files[0] ? e.target.files[0].name : null)} />
-            <div className={"dropzone bulk-drop" + (bulkFile ? " filled" : "")} onClick={() => bulkRef.current && bulkRef.current.click()}>
+              onChange={(e) => setBulkFile(e.target.files?.[0] ? e.target.files[0].name : null)} />
+            <div className={"dropzone bulk-drop" + (bulkFile ? " filled" : "")} onClick={() => bulkRef.current?.click()}>
               {bulkFile ? (
                 <>
                   <Icon.check />
@@ -389,7 +414,7 @@ export default function CrearOrdenPage() {
   );
 }
 
-function ResumenRow({ label, value }) {
+function ResumenRow({ label, value }: { label: ReactNode; value: ReactNode }) {
   return (
     <div className="between" style={{ padding: "5px 0" }}>
       <span className="t-muted" style={{ textTransform: "uppercase", letterSpacing: ".03em", fontWeight: 700, fontSize: 11.5 }}>{label}</span>
@@ -398,12 +423,16 @@ function ResumenRow({ label, value }) {
   );
 }
 
-function ArticulosModal({ cart, setCart, onClose }) {
+function ArticulosModal({ cart, setCart, onClose }: {
+  cart: Cart;
+  setCart: Dispatch<SetStateAction<Cart>>;
+  onClose: () => void;
+}) {
   const [q, setQ] = useState("");
-  const [draft, setDraft] = useState({});
+  const [draft, setDraft] = useState<Cart>({});
   const lista = MP.productos.filter((p) => (p.nm + p.sku).toLowerCase().includes(q.toLowerCase()));
   function agregar() {
-    const next = { ...cart };
+    const next: Cart = { ...cart };
     Object.entries(draft).forEach(([id, n]) => { if (n > 0) next[id] = (next[id] || 0) + n; });
     setCart(next); onClose();
   }

@@ -1,14 +1,18 @@
 /* MegaPortal — iconos (stroke, lucide-style). Exportados como { Icon } */
 import React from "react";
 
+export type IconProps = React.SVGProps<SVGSVGElement>;
+type IconComponent = (props: IconProps) => React.ReactElement;
+
 export const Icon = (function () {
-  const S = ({ d, children, ...p }) => React.createElement(
-    "svg",
-    { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...p },
-    children || React.createElement("path", { d })
-  );
-  const P = (...ds) => (props) => S({ ...props, children: ds.map((d, i) => React.createElement("path", { d, key: i })) });
-  const raw = (children) => (props) => S({ ...props, children });
+  const S = ({ d, children, ...p }: { d?: string; children?: React.ReactNode } & IconProps): React.ReactElement =>
+    React.createElement(
+      "svg",
+      { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...p },
+      children || React.createElement("path", { d })
+    );
+  const P = (...ds: string[]): IconComponent => (props) => S({ ...props, children: ds.map((d, i) => React.createElement("path", { d, key: i })) });
+  const raw = (children: React.ReactNode): IconComponent => (props) => S({ ...props, children });
 
   return {
     home: P("M3 10.5 12 3l9 7.5", "M5 9.5V21h14V9.5", "M9 21v-6h6v6"),
@@ -103,3 +107,5 @@ export const Icon = (function () {
     drop: P("M12 3s6 6.5 6 10.5a6 6 0 0 1-12 0C6 9.5 12 3 12 3Z"),
   };
 })();
+
+export type IconName = keyof typeof Icon;

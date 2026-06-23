@@ -1,6 +1,19 @@
 /* Cementos San Marcos — miniaturas alusivas al producto (deriva del id/sku) */
+import type { IconName } from "@/components/icons";
+import type { Producto } from "@/lib/data";
 
-export const PROD_CATS = {
+export type ProdCat = "granel" | "saco" | "estuco" | "boquilla" | "mortero";
+
+/** Solo se necesitan id/sku para derivar la categoría y la miniatura. */
+export type ProdLike = Pick<Producto, "id" | "sku">;
+
+export interface ProdCatMeta {
+  icon: IconName;
+  cls: string;
+  label: string;
+}
+
+export const PROD_CATS: Record<ProdCat, ProdCatMeta> = {
   granel: { icon: "truck", cls: "blue", label: "Granel" },
   saco: { icon: "bag", cls: "orange", label: "Saco" },
   estuco: { icon: "bucket", cls: "green", label: "Estuco" },
@@ -8,7 +21,7 @@ export const PROD_CATS = {
   mortero: { icon: "layers", cls: "slate", label: "Mortero" },
 };
 
-export function prodCat(p) {
+export function prodCat(p: ProdLike): ProdCat {
   const id = (p.id || "") + (p.sku || "");
   if (/CEM-?ART|GRA|GRANEL/i.test(id)) return "granel";
   if (/EST/i.test(id)) return "estuco";
@@ -18,7 +31,7 @@ export function prodCat(p) {
 }
 
 /* SVG (data URI) del ícono de categoría — sirve de imagen del producto */
-const PROD_ICON_SVG = {
+const PROD_ICON_SVG: Record<ProdCat, string> = {
   granel: '<path d="M3 6h11v9H3z"/><path d="M14 9h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>',
   saco: '<path d="M6 8h12l-1 12a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M9.5 13h5"/>',
   estuco: '<path d="M5 7h14l-1.4 12.2a1 1 0 0 1-1 .8H7.4a1 1 0 0 1-1-.8L5 7Z"/><path d="M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3"/>',
@@ -26,12 +39,12 @@ const PROD_ICON_SVG = {
   mortero: '<path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/><path d="M3 16l9 5 9-5"/>',
 };
 
-const PROD_COLORS = {
+const PROD_COLORS: Record<ProdCat, [string, string]> = {
   granel: ["#E6ECFA", "#00359A"], saco: ["#FFF0E6", "#E25A00"], estuco: ["#E6F4EC", "#1E7A47"],
   boquilla: ["#F3ECFB", "#6D44C7"], mortero: ["#EEF0F3", "#4B5260"],
 };
 
-export function prodThumbSrc(p) {
+export function prodThumbSrc(p: ProdLike): string {
   const k = prodCat(p);
   const [bg, fg] = PROD_COLORS[k];
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">'
@@ -41,7 +54,7 @@ export function prodThumbSrc(p) {
   return "data:image/svg+xml," + encodeURIComponent(svg);
 }
 
-export function prodThumbSrcLarge(p) {
+export function prodThumbSrcLarge(p: ProdLike): string {
   const k = prodCat(p);
   const [bg, fg] = PROD_COLORS[k];
   // Icono 24px escalado x2.2 (≈53px) centrado en un lienzo 240x150

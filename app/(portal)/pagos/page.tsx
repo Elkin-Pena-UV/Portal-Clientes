@@ -2,30 +2,32 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/icons";
-import { MP } from "@/lib/data";
+import { MP, type Factura } from "@/lib/data";
 import { Pill, Checkbox } from "@/components/ui";
 
+type TabPago = "pagar" | "edades" | "historial" | "solicitudes";
+
 export default function PagosPage() {
-  const [tab, setTab] = useState("pagar");
-  const [sel, setSel] = useState({});
-  const [montos, setMontos] = useState({});
-  const [antAplic, setAntAplic] = useState({});
+  const [tab, setTab] = useState<TabPago>("pagar");
+  const [sel, setSel] = useState<Record<string, boolean>>({});
+  const [montos, setMontos] = useState<Record<string, number>>({});
+  const [antAplic, setAntAplic] = useState<Record<string, boolean>>({});
   const [paid, setPaid] = useState(false);
   const pct = Math.round((MP.cupo.utilizado / MP.cupo.total) * 100);
 
   const seleccionadas = MP.facturas.filter((f) => sel[f.id]);
-  const montoDe = (f) => (sel[f.id] ? (montos[f.id] != null ? montos[f.id] : f.valor) : 0);
+  const montoDe = (f: Factura) => (sel[f.id] ? (montos[f.id] != null ? montos[f.id] : f.valor) : 0);
   const totalFacturas = seleccionadas.reduce((s, f) => s + montoDe(f), 0);
   const antDisponible = MP.anticipos.reduce((s, a) => s + a.valor, 0);
   const antAplicado = Math.min(MP.anticipos.filter((a) => antAplic[a.id]).reduce((s, a) => s + a.valor, 0), totalFacturas);
   const totalPagar = Math.max(0, totalFacturas - antAplicado);
-  const toggle = (id) => setSel((s) => ({ ...s, [id]: !s[id] }));
-  const toggleAnt = (id) => setAntAplic((s) => ({ ...s, [id]: !s[id] }));
+  const toggle = (id: string) => setSel((s) => ({ ...s, [id]: !s[id] }));
+  const toggleAnt = (id: string) => setAntAplic((s) => ({ ...s, [id]: !s[id] }));
   const allOn = MP.facturas.every((f) => sel[f.id]);
-  const toggleAll = () => { const v = !allOn; const n = {}; MP.facturas.forEach((f) => (n[f.id] = v)); setSel(n); };
+  const toggleAll = () => { const v = !allOn; const n: Record<string, boolean> = {}; MP.facturas.forEach((f) => (n[f.id] = v)); setSel(n); };
   const maxEdad = Math.max(...MP.cartera.edades.map((e) => e.valor));
 
-  const tabs = [
+  const tabs: { id: TabPago; label: string }[] = [
     { id: "pagar", label: "Pagar cartera" },
     { id: "edades", label: "Cartera por edades" },
     { id: "historial", label: "Historial de pagos" },
@@ -100,7 +102,7 @@ export default function PagosPage() {
                 </tr></thead>
                 <tbody>
                   {MP.facturas.map((f) => (
-                    <tr key={f.id} style={sel[f.id] ? { background: "var(--orange-light)" } : null}>
+                    <tr key={f.id} style={sel[f.id] ? { background: "var(--orange-light)" } : undefined}>
                       <td><Checkbox on={!!sel[f.id]} onClick={() => toggle(f.id)} /></td>
                       <td className="t-strong t-mono">{f.id}</td>
                       <td className="t-muted">{f.venc}</td>

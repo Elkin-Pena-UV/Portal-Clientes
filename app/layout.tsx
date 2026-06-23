@@ -1,18 +1,20 @@
 import "./globals.css";
+import type { Metadata, Viewport } from "next";
+import type { ReactNode } from "react";
 import { AuthProvider } from "@/contexts/auth";
 import { ToastProvider } from "@/contexts/toast";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Cementos San Marcos — Portal de Clientes",
   description: "Crea órdenes, programa entregas, paga tu cartera con PSE y descarga facturas y remisiones firmadas.",
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
       <head>

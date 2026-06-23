@@ -1,13 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Icon } from "@/components/icons";
+import { Icon, type IconName } from "@/components/icons";
 import { MP } from "@/lib/data";
 import { Pill } from "@/components/ui";
 
+interface Acceso {
+  id: string;
+  t: string;
+  d: string;
+  ic: IconName;
+  c: string;
+}
+
 export default function InicioPage() {
   const router = useRouter();
-  const nav = (id) => router.push("/" + id);
+  const nav = (id: string) => router.push("/" + id);
 
   const pct = Math.round((MP.cupo.utilizado / MP.cupo.total) * 100);
   const recientes = MP.pedidos.slice(0, 4);
@@ -15,7 +23,7 @@ export default function InicioPage() {
   const enTransito = MP.pedidos.filter((p) => p.estado === "transito").length;
   const enConstr = MP.pedidos.filter((p) => p.estado === "pendiente").length;
 
-  const accesos = [
+  const accesos: Acceso[] = [
     { id: "crear", t: "Crear orden", d: "Nueva orden de compra", ic: "plus", c: "orange" },
     { id: "pedidos", t: "Mis pedidos", d: "Seguimiento e historial", ic: "box", c: "blue" },
     { id: "programacion", t: "Programación", d: "Próximas entregas", ic: "calendar", c: "blue" },

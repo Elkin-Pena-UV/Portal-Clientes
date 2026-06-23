@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/icons";
-import { MP } from "@/lib/data";
+import { MP, type DocRemision } from "@/lib/data";
 import { Pill, Checkbox, DetalleRow } from "@/components/ui";
 
 export default function DocumentosPage() {
-  const [tab, setTab] = useState("facturas");
-  const [sel, setSel] = useState({});
-  const [preview, setPreview] = useState(null);
-  const toggle = (id) => setSel((s) => ({ ...s, [id]: !s[id] }));
+  const [tab, setTab] = useState<"facturas" | "remisiones">("facturas");
+  const [sel, setSel] = useState<Record<string, boolean>>({});
+  const [preview, setPreview] = useState<DocRemision | null>(null);
+  const toggle = (id: string) => setSel((s) => ({ ...s, [id]: !s[id] }));
   const count = Object.values(sel).filter(Boolean).length;
 
   return (
@@ -34,7 +34,7 @@ export default function DocumentosPage() {
               <thead><tr><th style={{ width: 44 }}></th><th>Emisión</th><th>FN</th><th>Documento</th><th>Pedido</th><th>NIT</th><th className="num">Valor</th><th></th></tr></thead>
               <tbody>
                 {MP.docsFacturas.map((d) => (
-                  <tr key={d.id} style={sel[d.id] ? { background: "var(--orange-light)" } : null}>
+                  <tr key={d.id} style={sel[d.id] ? { background: "var(--orange-light)" } : undefined}>
                     <td><Checkbox on={!!sel[d.id]} onClick={() => toggle(d.id)} /></td>
                     <td className="t-muted">{d.emision}</td>
                     <td><Pill kind={d.fn === "FVE" ? "blue" : d.fn === "NC" ? "yellow" : "gray"} dot={false}>{d.fn}</Pill></td>
@@ -56,7 +56,7 @@ export default function DocumentosPage() {
               <thead><tr><th style={{ width: 44 }}></th><th>Emisión</th><th>Tipo</th><th>Documento</th><th>Pedido</th><th>Firma digital</th><th className="num">Valor</th><th></th></tr></thead>
               <tbody>
                 {MP.docsRemisiones.map((d) => (
-                  <tr key={d.id} style={sel[d.id] ? { background: "var(--orange-light)" } : null}>
+                  <tr key={d.id} style={sel[d.id] ? { background: "var(--orange-light)" } : undefined}>
                     <td><Checkbox on={!!sel[d.id]} onClick={() => toggle(d.id)} /></td>
                     <td className="t-muted">{d.emision}</td>
                     <td><Pill kind={d.tipo === "Remisión" ? "orange" : "gray"} dot={false}>{d.tipo}</Pill></td>
@@ -78,7 +78,7 @@ export default function DocumentosPage() {
   );
 }
 
-function RemisionModal({ doc, onClose }) {
+function RemisionModal({ doc, onClose }: { doc: DocRemision; onClose: () => void }) {
   return (
     <div className="modal-bg" onClick={onClose}>
       <div className="card modal-card" style={{ width: 460 }} onClick={(e) => e.stopPropagation()}>

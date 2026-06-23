@@ -1,11 +1,23 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Icon } from "@/components/icons";
+import { Icon, type IconName } from "@/components/icons";
 import { MP } from "@/lib/data";
 import { MLogo } from "@/components/ui";
 
-const NAV = [
+interface NavItem {
+  id: string;
+  label: string;
+  icon: IconName;
+  badge?: number;
+}
+
+interface NavGroup {
+  group: string;
+  items: NavItem[];
+}
+
+const NAV: NavGroup[] = [
   { group: "Principal", items: [
     { id: "inicio", label: "Inicio", icon: "home" },
   ]},
@@ -23,7 +35,11 @@ const NAV = [
   ]},
 ];
 
-export function Sidebar({ collapsed, onToggle, onLogout }) {
+export function Sidebar({ collapsed, onToggle, onLogout }: {
+  collapsed: boolean;
+  onToggle: () => void;
+  onLogout: () => void;
+}) {
   const pathname = usePathname();
   const router = useRouter();
 
