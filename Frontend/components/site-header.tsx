@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { HardHat, MapPin, PackagePlus } from 'lucide-react'
+import { FileSpreadsheet, HardHat, MapPin, PackagePlus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
   { href: '/', label: 'Crear pedido', icon: PackagePlus },
+  { href: '/cargar-plantilla', label: 'Cargar Excel', icon: FileSpreadsheet },
   { href: '/sedes', label: 'Sedes', icon: MapPin },
 ]
 
@@ -17,7 +18,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex size-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
+          <span className="flex size-9 items-center justify-center rounded-md bg-brand text-brand-foreground">
             <HardHat className="size-5" />
           </span>
           <div className="flex flex-col leading-none">
@@ -44,7 +45,7 @@ export function SiteHeader() {
                 className={cn(
                   'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                   active
-                    ? 'bg-primary text-primary-foreground'
+                    ? 'bg-brand text-brand-foreground'
                     : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
                 )}
               >

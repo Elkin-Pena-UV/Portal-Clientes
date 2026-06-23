@@ -75,8 +75,15 @@ export function ProductPickerDialog({
   const totalProductos = Object.keys(draft).length
 
   function handleConfirm() {
+    const prevFechas = new Map(
+      currentItems.map((i) => [i.productoId, i.fechaEntrega]),
+    )
     const items: ItemPedido[] = Object.entries(draft).map(
-      ([productoId, cantidad]) => ({ productoId, cantidad }),
+      ([productoId, cantidad]) => ({
+        productoId,
+        cantidad,
+        fechaEntrega: prevFechas.get(productoId) ?? null,
+      }),
     )
     onConfirm(items)
     onOpenChange(false)

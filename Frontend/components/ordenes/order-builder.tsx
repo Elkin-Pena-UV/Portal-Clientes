@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { toast } from 'sonner'
-import { CheckCircle2, ClipboardList, Loader2, Package, Plus } from 'lucide-react'
+import { CheckCircle2, ClipboardList, Loader2, Plus } from 'lucide-react'
 import type { Pedido } from '@/lib/types'
 import {
   clonarPedido,
@@ -10,7 +10,10 @@ import {
   pedidoCompleto,
   pasoActual,
   totalUnidades,
+  totalesGlobales,
 } from '@/lib/order-utils'
+import { formatCOP } from '@/lib/format'
+import { usePortal } from '@/components/portal-provider'
 import { OrderStepper } from '@/components/ordenes/order-stepper'
 import { PedidoCard } from '@/components/ordenes/pedido-card'
 import { Button } from '@/components/ui/button'
@@ -23,15 +26,31 @@ import {
 } from '@/components/ui/card'
 
 export function OrderBuilder() {
+  const { getProducto, consumirBorradorImportado } = usePortal()
   const [pedidos, setPedidos] = React.useState<Pedido[]>(() => [nuevoPedido()])
   const [openId, setOpenId] = React.useState<string>(() => pedidos[0].id)
   const [showErrors, setShowErrors] = React.useState(false)
   const [submitting, setSubmitting] = React.useState(false)
   const [confirmed, setConfirmed] = React.useState(false)
 
+  // Cargar un lote importado desde la plantilla Excel, si existe.
+  React.useEffect(() => {
+    const borrador = consumirBorradorImportado()
+    if (borrador && borrador.length) {
+      setPedidos(borrador)
+      setOpenId(borrador[0].id)
+      toast.info(
+        `Se cargaron ${borrador.length} ${
+          borrador.length === 1 ? 'pedido' : 'pedidos'
+        } desde la plantilla para edición.`,
+      )
+    }
+  }, [consumirBorradorImportado])
+
   const totalPedidos = pedidos.length
   const totalUnidadesGlobal = pedidos.reduce((acc, p) => acc + totalUnidades(p), 0)
   const totalProductos = pedidos.reduce((acc, p) => acc + p.items.length, 0)
+  const totales = totalesGlobales(pedidos, getProducto)
 
   // El stepper global refleja el primer paso pendiente entre todos los pedidos.
   const stepperCurrent = React.useMemo(() => {
@@ -158,41 +177,52 @@ export function OrderBuilder() {
 
       {/* Resumen sticky */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-        <div className="mx-auto flex w-full max-w-3xl items-center gap-4 px-4 py-3">
-          <div className="flex items-center gap-4 text-sm">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
             <div className="flex items-center gap-2">
-              <ClipboardList className="size-4 text-muted-foreground" />
+              <ClipboardList className="size-4 text-brand" />
               <span>
                 <span className="font-semibold">{totalPedidos}</span>{' '}
                 <span className="text-muted-foreground">
                   {totalPedidos === 1 ? 'pedido' : 'pedidos'}
                 </span>
+                <span className="text-muted-foreground">
+                  {' · '}
+                  {totalProductos} prod. · {totalUnidadesGlobal} und.
+                </span>
               </span>
             </div>
-            <div className="hidden items-center gap-2 sm:flex">
-              <Package className="size-4 text-muted-foreground" />
-              <span>
-                <span className="font-semibold">{totalProductos}</span>{' '}
-                <span className="text-muted-foreground">prod.</span>
+            <div className="flex items-center gap-x-4 gap-y-1">
+              <span className="text-muted-foreground">
+                Neto{' '}
+                <span className="font-medium text-foreground tabular-nums">
+                  {formatCOP(totales.neto)}
+                </span>
               </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span>
-                <span className="font-semibold">{totalUnidadesGlobal}</span>{' '}
-                <span className="text-muted-foreground">und.</span>
+              <span className="text-muted-foreground">
+                IVA{' '}
+                <span className="font-medium text-foreground tabular-nums">
+                  {formatCOP(totales.iva)}
+                </span>
               </span>
             </div>
           </div>
-          <Button
-            onClick={confirmar}
-            disabled={submitting}
-            className="ml-auto"
-          >
-            {submitting && (
-              <Loader2 data-icon="inline-start" className="animate-spin" />
-            )}
-            Confirmar pedidos
-          </Button>
+          <div className="flex items-center justify-between gap-4 sm:ml-auto">
+            <div className="flex flex-col leading-tight">
+              <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                Total general
+              </span>
+              <span className="text-lg font-bold tabular-nums text-primary">
+                {formatCOP(totales.total)}
+              </span>
+            </div>
+            <Button onClick={confirmar} disabled={submitting}>
+              {submitting && (
+                <Loader2 data-icon="inline-start" className="animate-spin" />
+              )}
+              Confirmar pedidos
+            </Button>
+          </div>
         </div>
       </div>
     </div>

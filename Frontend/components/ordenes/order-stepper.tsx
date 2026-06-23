@@ -23,7 +23,7 @@ export function OrderStepper({ current }: { current: number }) {
                 className={cn(
                   'flex size-8 shrink-0 items-center justify-center rounded-full border text-sm font-semibold transition-colors',
                   status === 'complete' &&
-                    'border-primary bg-primary text-primary-foreground',
+                    'border-brand bg-brand text-brand-foreground',
                   status === 'current' &&
                     'border-primary bg-primary/10 text-primary',
                   status === 'pending' &&
@@ -51,7 +51,7 @@ export function OrderStepper({ current }: { current: number }) {
               <span
                 className={cn(
                   'h-px flex-1 transition-colors',
-                  index < current ? 'bg-primary' : 'bg-border',
+                  index < current ? 'bg-brand' : 'bg-border',
                 )}
               />
             )}

@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import Image from 'next/image'
 import {
   Boxes,
   CheckCircle2,
@@ -22,11 +21,11 @@ import type {
   TipoProducto,
 } from '@/lib/types'
 import { usePortal } from '@/components/portal-provider'
-import { despachoCompleto, totalUnidades } from '@/lib/order-utils'
-import { formatCOP } from '@/lib/format'
+import { despachoCompleto, fechasCompletas, totalUnidades } from '@/lib/order-utils'
 import { RadioCards } from '@/components/ordenes/radio-cards'
 import { SedeCombobox } from '@/components/ordenes/sede-combobox'
 import { ProductPickerDialog } from '@/components/ordenes/product-picker-dialog'
+import { ProductLine } from '@/components/ordenes/product-line'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -63,10 +62,10 @@ function StepHeading({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+      <span className="flex size-6 items-center justify-center rounded-full bg-brand/10 text-xs font-semibold text-brand">
         {step}
       </span>
-      <h4 className="text-sm font-semibold">{title}</h4>
+      <h4 className="text-sm font-semibold text-brand">{title}</h4>
     </div>
   )
 }
@@ -125,6 +124,16 @@ export function PedidoCard({
       )
     }
   }
+
+  function updateItemFecha(productoId: string, fechaEntrega: string) {
+    setItems(
+      pedido.items.map((i) =>
+        i.productoId === productoId ? { ...i, fechaEntrega } : i,
+      ),
+    )
+  }
+
+  const faltanFechas = pedido.items.length > 0 && !fechasCompletas(pedido)
 
   const unidades = totalUnidades(pedido)
   const e = pedido.datosEntrega
@@ -359,7 +368,7 @@ export function PedidoCard({
                         }
                       />
                       <FieldLabel htmlFor={`descarga-${pedido.id}`}>
-                        ¿Necesita descarga?
+                        ¿Descarga incluida?
                       </FieldLabel>
                     </Field>
                   </div>
@@ -507,7 +516,7 @@ export function PedidoCard({
             <div className="flex items-center justify-between gap-2">
               <StepHeading step={3} title="Productos" />
               {unidades > 0 && (
-                <Badge variant="secondary" className="gap-1">
+                <Badge className="gap-1">
                   <Layers className="size-3" />
                   {unidades} und.
                 </Badge>
@@ -534,91 +543,30 @@ export function PedidoCard({
               </div>
             ) : (
               <div className="flex flex-col gap-2">
-                <ul className="flex flex-col divide-y rounded-lg border">
-                  {pedido.items.map((item) => {
-                    const producto = getProducto(item.productoId)
-                    if (!producto) return null
-                    return (
-                      <li
-                        key={item.productoId}
-                        className="flex items-center gap-3 p-3"
-                      >
-                        <div className="relative size-12 shrink-0 overflow-hidden rounded-md bg-muted">
-                          <Image
-                            src={producto.imagen || '/placeholder.svg'}
-                            alt={producto.nombre}
-                            fill
-                            sizes="48px"
-                            className="object-cover"
-                          />
-                        </div>
-                        <div className="flex min-w-0 flex-1 flex-col">
-                          <span className="truncate text-sm font-medium">
-                            {producto.nombre}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {producto.marca} · {formatCOP(producto.precio)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            className="size-7"
-                            onClick={() =>
-                              updateItemQty(item.productoId, item.cantidad - 1)
-                            }
-                            aria-label="Disminuir cantidad"
-                          >
-                            <span className="text-base leading-none">−</span>
-                          </Button>
-                          <input
-                            type="number"
-                            min={0}
-                            inputMode="numeric"
-                            value={item.cantidad}
-                            onChange={(ev) =>
-                              updateItemQty(
-                                item.productoId,
-                                Math.max(0, Number(ev.target.value) || 0),
-                              )
-                            }
-                            className="h-7 w-12 rounded-md border bg-background text-center text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                            aria-label={`Cantidad de ${producto.nombre}`}
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            className="size-7"
-                            onClick={() =>
-                              updateItemQty(item.productoId, item.cantidad + 1)
-                            }
-                            aria-label="Aumentar cantidad"
-                          >
-                            <span className="text-base leading-none">+</span>
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="size-7"
-                            onClick={() => updateItemQty(item.productoId, 0)}
-                            aria-label={`Eliminar ${producto.nombre}`}
-                          >
-                            <Trash2 className="text-destructive" />
-                          </Button>
-                        </div>
-                      </li>
-                    )
-                  })}
-                </ul>
+                {pedido.items.map((item) => {
+                  const producto = getProducto(item.productoId)
+                  if (!producto) return null
+                  return (
+                    <ProductLine
+                      key={item.productoId}
+                      producto={producto}
+                      item={item}
+                      onQtyChange={updateItemQty}
+                      onFechaChange={updateItemFecha}
+                      showErrors={showErrors}
+                    />
+                  )
+                })}
+                {showErrors && faltanFechas && (
+                  <p className="text-sm font-medium text-destructive">
+                    Asigna una fecha de entrega a todos los productos.
+                  </p>
+                )}
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setPickerOpen(true)}
-                  className="self-start"
+                  className="mt-1 self-start"
                 >
                   <Pencil data-icon="inline-start" />
                   Editar productos

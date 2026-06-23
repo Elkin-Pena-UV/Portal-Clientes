@@ -14,11 +14,16 @@ export type TipoProducto = 'saco' | 'granel'
 
 export interface Producto {
   id: string
+  codigo: string
   nombre: string
   marca: string
   tipo: TipoProducto
   presentacion: string
+  /** Unidad de medida, ej: "Bulto 50kg", "Ton", "m³" */
+  unidad: string
   precio: number
+  /** Porcentaje de IVA en decimal, ej: 0.19 */
+  iva: number
   imagen: string
 }
 
@@ -46,6 +51,8 @@ export interface DatosRetira {
 export interface ItemPedido {
   productoId: string
   cantidad: number
+  /** Fecha de entrega individual del producto (ISO yyyy-mm-dd) */
+  fechaEntrega: string | null
 }
 
 export interface Pedido {

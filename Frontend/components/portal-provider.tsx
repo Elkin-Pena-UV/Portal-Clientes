@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import type { Producto, Sede } from '@/lib/types'
+import type { Pedido, Producto, Sede } from '@/lib/types'
 import { productosMock, sedesMock } from '@/lib/mock-data'
 
 interface PortalContextValue {
@@ -12,6 +12,10 @@ interface PortalContextValue {
   deleteSede: (id: string) => void
   getSede: (id: string) => Sede | undefined
   getProducto: (id: string) => Producto | undefined
+  /** Lote de pedidos importados desde Excel, pendiente de cargar en el constructor. */
+  setBorradorImportado: (pedidos: Pedido[]) => void
+  /** Devuelve y limpia el lote importado (uso único al abrir "Crear pedido"). */
+  consumirBorradorImportado: () => Pedido[] | null
 }
 
 const PortalContext = React.createContext<PortalContextValue | null>(null)
@@ -23,6 +27,17 @@ function uid() {
 export function PortalProvider({ children }: { children: React.ReactNode }) {
   const [sedes, setSedes] = React.useState<Sede[]>(sedesMock)
   const [productos] = React.useState<Producto[]>(productosMock)
+  const borradorRef = React.useRef<Pedido[] | null>(null)
+
+  const setBorradorImportado = React.useCallback((pedidos: Pedido[]) => {
+    borradorRef.current = pedidos
+  }, [])
+
+  const consumirBorradorImportado = React.useCallback(() => {
+    const b = borradorRef.current
+    borradorRef.current = null
+    return b
+  }, [])
 
   const addSede = React.useCallback((sede: Omit<Sede, 'id'>) => {
     setSedes((prev) => [{ ...sede, id: uid() }, ...prev])
@@ -58,8 +73,20 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
       deleteSede,
       getSede,
       getProducto,
+      setBorradorImportado,
+      consumirBorradorImportado,
     }),
-    [sedes, productos, addSede, updateSede, deleteSede, getSede, getProducto],
+    [
+      sedes,
+      productos,
+      addSede,
+      updateSede,
+      deleteSede,
+      getSede,
+      getProducto,
+      setBorradorImportado,
+      consumirBorradorImportado,
+    ],
   )
 
   return <PortalContext.Provider value={value}>{children}</PortalContext.Provider>
