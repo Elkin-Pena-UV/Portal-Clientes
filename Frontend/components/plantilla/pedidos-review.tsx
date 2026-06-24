@@ -48,7 +48,6 @@ export function PedidosReview({
   return (
     <div className="flex flex-col gap-4">
       <Accordion
-        type="multiple"
         defaultValue={pedidos.map((p) => p.pedido.id)}
         className="flex flex-col gap-3"
       >
@@ -121,6 +120,14 @@ export function PedidosReview({
                           : pedido.datosRetira.celular
                       }
                     />
+                    <InfoItem
+                      label="Orden de compra"
+                      value={
+                        entregar
+                          ? pedido.datosEntrega.ordenCompra
+                          : pedido.datosRetira.ordenCompra
+                      }
+                    />
                     {entregar ? (
                       <>
                         <InfoItem
@@ -133,6 +140,12 @@ export function PedidosReview({
                             pedido.datosEntrega.necesitaDescarga ? 'Sí' : 'No'
                           }`}
                         />
+                        {pedido.datosEntrega.observaciones && (
+                          <InfoItem
+                            label="Observaciones"
+                            value={pedido.datosEntrega.observaciones}
+                          />
+                        )}
                       </>
                     ) : (
                       <>

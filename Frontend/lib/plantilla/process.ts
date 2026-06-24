@@ -141,6 +141,7 @@ interface FilaValidada {
   filaNum: number
   metodo: MetodoDespacho
   sede: Sede
+  ordenCompra: string
   nombreContacto: string
   celular: string
   correo: string
@@ -204,6 +205,12 @@ export function procesarFilas(
           ? `La sede "${fila.sede}" no existe.${sug ? ` ¿Quisiste decir "${sug}"?` : ''}`
           : 'La sede es obligatoria.',
       )
+      ok = false
+    }
+
+    const ordenCompra = fila.ordenCompra.trim()
+    if (!ordenCompra) {
+      err('Orden de compra', 'La orden de compra es obligatoria.')
       ok = false
     }
 
@@ -307,6 +314,7 @@ export function procesarFilas(
         filaNum,
         metodo,
         sede,
+        ordenCompra,
         nombreContacto: fila.nombreContacto.trim(),
         celular: fila.celular.trim(),
         correo,
@@ -349,17 +357,20 @@ export function procesarFilas(
         base.metodo === 'entregar'
           ? {
               sedeId: base.sede.id,
+              ordenCompra: base.ordenCompra,
               nombreRecibe: base.nombreContacto,
               celular: base.celular,
               correo: base.correo,
               necesitaEstiba: base.estiba,
               necesitaDescarga: base.descarga,
+              observaciones: base.observaciones,
             }
           : datosEntregaVacios(),
       datosRetira:
         base.metodo === 'retira'
           ? {
               sedeId: base.sede.id,
+              ordenCompra: base.ordenCompra,
               nombreConductor: base.nombreContacto,
               cedula: base.cedula,
               placa: base.placa,

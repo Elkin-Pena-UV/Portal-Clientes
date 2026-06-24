@@ -44,6 +44,14 @@ export const COLUMNAS: ColumnaDef[] = [
     ejemplo: 'Obra Torre Central',
   },
   {
+    key: 'ordenCompra',
+    header: 'Orden de compra',
+    width: 18,
+    critica: true,
+    ayuda: 'Obligatorio para ambos métodos (Entregar y Retira). Número o código de la orden de compra.',
+    ejemplo: '254701',
+  },
+  {
     key: 'nombreContacto',
     header: 'Nombre destinatario / Conductor',
     width: 28,
@@ -97,7 +105,7 @@ export const COLUMNAS: ColumnaDef[] = [
     key: 'observaciones',
     header: 'Observaciones',
     width: 30,
-    ayuda: 'Opcional. Notas adicionales (especialmente útil para Retira).',
+    ayuda: 'Opcional. Notas adicionales para la entrega o el retiro.',
     ejemplo: 'Llamar antes de llegar',
   },
   {

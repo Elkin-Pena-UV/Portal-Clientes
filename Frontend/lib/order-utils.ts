@@ -92,6 +92,7 @@ export function despachoCompleto(pedido: Pedido): boolean {
     const d = pedido.datosEntrega
     return (
       !!d.sedeId &&
+      !!d.ordenCompra.trim() &&
       !!d.nombreRecibe.trim() &&
       /^\d{10}$/.test(d.celular) &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.correo)
@@ -101,6 +102,7 @@ export function despachoCompleto(pedido: Pedido): boolean {
     const d = pedido.datosRetira
     return (
       !!d.sedeId &&
+      !!d.ordenCompra.trim() &&
       !!d.nombreConductor.trim() &&
       /^\d{6,10}$/.test(d.cedula) &&
       /^[A-Z]{3}\d{3}$/.test(d.placa) &&

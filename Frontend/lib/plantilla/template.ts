@@ -85,6 +85,7 @@ export async function generarPlantilla(
     {
       metodoDespacho: 'Entregar',
       sede: sedes[0]?.nombre ?? 'Obra Torre Central',
+      ordenCompra: '254701',
       nombreContacto: 'Marcela Ríos',
       celular: '3104567890',
       correo: 'marcela@obra.com',
@@ -92,7 +93,7 @@ export async function generarPlantilla(
       placa: '',
       estiba: 'SÍ',
       descarga: 'SÍ',
-      observaciones: '',
+      observaciones: 'Entregar en horario de la mañana',
       codigoProducto: 'COD-0042',
       cantidad: '100',
       fechaEntrega: fechaEjemplo(7),
@@ -102,6 +103,7 @@ export async function generarPlantilla(
     {
       metodoDespacho: 'Retira',
       sede: sedes[1]?.nombre ?? 'Punto de Venta Norte',
+      ordenCompra: '254702',
       nombreContacto: 'Juan Conductor',
       celular: '3201112233',
       correo: '',
@@ -119,6 +121,7 @@ export async function generarPlantilla(
     {
       metodoDespacho: 'Entregar',
       sede: sedes[2]?.nombre ?? 'Obra Conjunto Las Palmas',
+      ordenCompra: '254703',
       nombreContacto: 'Julián Vélez',
       celular: '3009876543',
       correo: 'julian@palmas.com',
@@ -136,6 +139,7 @@ export async function generarPlantilla(
     {
       metodoDespacho: 'Entregar',
       sede: sedes[2]?.nombre ?? 'Obra Conjunto Las Palmas',
+      ordenCompra: '254703',
       nombreContacto: 'Julián Vélez',
       celular: '3009876543',
       correo: 'julian@palmas.com',
@@ -153,6 +157,7 @@ export async function generarPlantilla(
     {
       metodoDespacho: 'Retira',
       sede: sedes[3]?.nombre ?? 'Punto de Venta Sur',
+      ordenCompra: '254704',
       nombreContacto: 'Andrea Conductor',
       celular: '3157654321',
       correo: '',
@@ -173,41 +178,57 @@ export async function generarPlantilla(
     ej.nombreProducto = getProd(ej.codigoProducto)?.nombre ?? ''
     ws.addRow(ej)
   })
+  
+  // Letra de columna por key (independiente del orden, para no romper al
+  // agregar/mover columnas en COLUMNAS).
+  const colLetra = (key: string) => {
+    const idx = COLUMNAS.findIndex((c) => c.key === key)
+    return ws.getColumn(idx + 1).letter
+  }
+  const L = {
+    metodo: colLetra('metodoDespacho'),
+    sede: colLetra('sede'),
+    estiba: colLetra('estiba'),
+    descarga: colLetra('descarga'),
+    codigo: colLetra('codigoProducto'),
+    cantidad: colLetra('cantidad'),
+    multi: colLetra('multiProducto'),
+  }
 
   // Validaciones de datos para las filas de datos (encabezado + ejemplos + filas extra).
   const ultimaFila = 200
   for (let r = 2; r <= ultimaFila; r++) {
-    ws.getCell(`A${r}`).dataValidation = {
+    ws.getCell(`${L.metodo}${r}`).dataValidation = {
       type: 'list',
       allowBlank: true,
       formulae: [rangoDespacho],
     }
-    ws.getCell(`B${r}`).dataValidation = {
+    ws.getCell(`${L.sede}${r}`).dataValidation = {
       type: 'list',
       allowBlank: true,
       formulae: [rangoSedes],
     }
-    ws.getCell(`H${r}`).dataValidation = {
+    ws.getCell(`${L.estiba}${r}`).dataValidation = {
       type: 'list',
       allowBlank: true,
       formulae: [rangoSiNo],
     }
-    ws.getCell(`I${r}`).dataValidation = {
+    ws.getCell(`${L.descarga}${r}`).dataValidation = {
       type: 'list',
       allowBlank: true,
       formulae: [rangoSiNo],
     }
-    ws.getCell(`K${r}`).dataValidation = {
+    ws.getCell(`${L.codigo}${r}`).dataValidation = {
       type: 'list',
       allowBlank: true,
       formulae: [rangoCodigos],
     }
-    ws.getCell(`O${r}`).dataValidation = {
+    ws.getCell(`${L.multi}${r}`).dataValidation = {
       type: 'list',
       allowBlank: true,
       formulae: [rangoSiNo],
     }
-    ws.getCell(`M${r}`).dataValidation = {
+    ws.getCell(`${L.cantidad}${r}`).dataValidation = {
       type: 'whole',
       operator: 'greaterThan',
       allowBlank: true,

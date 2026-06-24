@@ -31,15 +31,18 @@ export type MetodoDespacho = 'entregar' | 'retira'
 
 export interface DatosEntrega {
   sedeId: string
+  ordenCompra: string
   nombreRecibe: string
   celular: string
   correo: string
   necesitaEstiba: boolean
   necesitaDescarga: boolean
+  observaciones: string
 }
 
 export interface DatosRetira {
   sedeId: string
+  ordenCompra: string
   nombreConductor: string
   cedula: string
   placa: string
@@ -66,15 +69,18 @@ export interface Pedido {
 
 export const datosEntregaVacios = (): DatosEntrega => ({
   sedeId: '',
+  ordenCompra: '',
   nombreRecibe: '',
   celular: '',
   correo: '',
   necesitaEstiba: false,
   necesitaDescarga: false,
+  observaciones: '',
 })
 
 export const datosRetiraVacios = (): DatosRetira => ({
   sedeId: '',
+  ordenCompra: '',
   nombreConductor: '',
   cedula: '',
   placa: '',

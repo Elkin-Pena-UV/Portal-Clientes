@@ -169,7 +169,7 @@ export function PedidoCard({
             <span className="truncate text-xs text-muted-foreground">
               {pedido.tipoProducto
                 ? pedido.tipoProducto === 'saco'
-                  ? 'Cemento en saco'
+                  ? 'Productos ensacados'
                   : 'Cemento a granel'
                 : 'Sin configurar'}
               {unidades > 0 ? ` · ${unidades} und.` : ''}
@@ -218,8 +218,8 @@ export function PedidoCard({
               options={[
                 {
                   value: 'saco',
-                  title: 'Cemento en saco',
-                  description: 'Presentaciones empacadas por bultos.',
+                  title: 'Productos ensacados',
+                  description: 'Cementos y linea de acabados.',
                   icon: Package,
                 },
                 {
@@ -280,6 +280,24 @@ export function PedidoCard({
                       <FieldError>Selecciona un punto de entrega.</FieldError>
                     )}
                   </Field>
+
+                  <Field data-invalid={showErrors && !e.ordenCompra.trim()}>
+                  <FieldLabel htmlFor={`oc-e-${pedido.id}`}>
+                    Orden de compra
+                  </FieldLabel>
+                  <Input
+                    id={`oc-e-${pedido.id}`}
+                    value={e.ordenCompra}
+                    onChange={(ev) =>
+                      setEntrega({ ordenCompra: ev.target.value })
+                    }
+                    aria-invalid={showErrors && !e.ordenCompra.trim()}
+                    placeholder="Ej: 254701"
+                  />
+                  {showErrors && !e.ordenCompra.trim() && (
+                    <FieldError>Ingresa la orden de compra.</FieldError>
+                  )}
+                </Field>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field data-invalid={showErrors && !e.nombreRecibe.trim()}>
@@ -372,6 +390,20 @@ export function PedidoCard({
                       </FieldLabel>
                     </Field>
                   </div>
+                  <Field>
+                    <FieldLabel htmlFor={`obs-e-${pedido.id}`}>
+                      Observaciones (opcional)
+                    </FieldLabel>
+                    <Textarea
+                      id={`obs-e-${pedido.id}`}
+                      value={e.observaciones}
+                      onChange={(ev) =>
+                        setEntrega({ observaciones: ev.target.value })
+                      }
+                      placeholder="Indicaciones adicionales para la entrega..."
+                      rows={3}
+                    />
+                  </Field>
                 </FieldGroup>
               </div>
             )}
@@ -393,6 +425,23 @@ export function PedidoCard({
                     )}
                   </Field>
 
+                  <Field data-invalid={showErrors && !r.ordenCompra.trim()}>
+                    <FieldLabel htmlFor={`oc-r-${pedido.id}`}>
+                      Orden de compra
+                    </FieldLabel>
+                    <Input
+                      id={`oc-r-${pedido.id}`}
+                      value={r.ordenCompra}
+                      onChange={(ev) =>
+                        setRetira({ ordenCompra: ev.target.value })
+                      }
+                      aria-invalid={showErrors && !r.ordenCompra.trim()}
+                      placeholder="Ej: 254701"
+                    />
+                    {showErrors && !r.ordenCompra.trim() && (
+                      <FieldError>Ingresa la orden de compra.</FieldError>
+                    )}
+                  </Field>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field data-invalid={showErrors && !r.nombreConductor.trim()}>
                       <FieldLabel htmlFor={`cond-${pedido.id}`}>

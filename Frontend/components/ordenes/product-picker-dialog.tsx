@@ -94,7 +94,7 @@ export function ProductPickerDialog({
       <DialogContent className="flex max-h-[90vh] flex-col gap-0 p-0 sm:max-w-3xl">
         <DialogHeader className="border-b p-4">
           <DialogTitle>
-            Agregar productos · {tipoProducto === 'saco' ? 'Cemento en saco' : 'Cemento a granel'}
+            Agregar productos · {tipoProducto === 'saco' ? 'Productos ensacados' : 'Cemento a granel'}
           </DialogTitle>
           <DialogDescription>
             Ajusta las cantidades de los productos que deseas incluir en el

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Portal de Clientes | Materiales de Construcción',
   description:
-    'Crea y gestiona tus pedidos de cemento en saco y a granel de forma rápida y clara.',
+    'Crea y gestiona tus pedidos de productos ensacados y a granel de forma rápida y clara.',
   generator: 'v0.app',
 }
 
