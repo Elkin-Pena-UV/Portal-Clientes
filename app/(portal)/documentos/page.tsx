@@ -31,7 +31,7 @@ export default function DocumentosPage() {
         {tab === "facturas" && (
           <div className="tbl-wrap">
             <table className="tbl">
-              <thead><tr><th style={{ width: 44 }}></th><th>Emisión</th><th>FN</th><th>Documento</th><th>Pedido</th><th>NIT</th><th className="num">Valor</th><th></th></tr></thead>
+              <thead><tr><th style={{ width: 44 }}></th><th>Emisión</th><th>FN</th><th>Documento</th><th>Pedido</th><th>Orden de Compra</th><th>NIT</th><th className="num">Valor</th><th></th></tr></thead>
               <tbody>
                 {MP.docsFacturas.map((d) => (
                   <tr key={d.id} style={sel[d.id] ? { background: "var(--orange-light)" } : undefined}>
@@ -40,6 +40,7 @@ export default function DocumentosPage() {
                     <td><Pill kind={d.fn === "FVE" ? "blue" : d.fn === "NC" ? "yellow" : "gray"} dot={false}>{d.fn}</Pill></td>
                     <td><div className="t-strong t-mono">{d.id}</div><div className="t-muted" style={{ fontSize: 12.5 }}>{d.doc}</div></td>
                     <td className="t-muted t-mono">{d.pedido}</td>
+                    <td className="t-muted t-mono">{d.oc}</td>
                     <td className="t-muted t-mono">{d.nit}</td>
                     <td className="num t-mono" style={{ color: d.valor < 0 ? "var(--red-ink)" : "var(--ink)" }}>{(d.valor < 0 ? "−" : "") + MP.COP(Math.abs(d.valor))}</td>
                     <td><button className="btn btn-quiet btn-sm"><Icon.download /> PDF</button></td>

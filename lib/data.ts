@@ -149,6 +149,7 @@ export interface DocFactura {
   fn: string;
   doc: string;
   pedido: string;
+  oc: string;
   nit: string;
   valor: number;
   adj: boolean;
@@ -325,15 +326,17 @@ const factEstados: Record<FactEstado, EstadoMeta> = {
 
 // Documentos — Facturas y Notas / Remisiones y Devoluciones
 const docsFacturas: DocFactura[] = [
-  { id: "FVE-44821", emision: "21 may 2026", fn: "FVE", doc: "Factura de venta", pedido: "T-292313", nit: "830.221.554-8", valor: 18420000, adj: true },
-  { id: "NC-1182", emision: "18 may 2026", fn: "NC", doc: "Nota crédito", pedido: "T-291786", nit: "830.221.554-8", valor: -1340000, adj: true },
-  { id: "FVE-44780", emision: "19 may 2026", fn: "FVE", doc: "Factura de venta", pedido: "T-292208", nit: "830.221.554-8", valor: 12750000, adj: true },
-  { id: "ND-0421", emision: "12 may 2026", fn: "ND", doc: "Nota débito", pedido: "T-290985", nit: "830.221.554-8", valor: 540000, adj: false },
+  { id: "FVE-44821", emision: "21 may 2026", fn: "FVE", doc: "Factura de venta", pedido: "PVC-292313", oc: "OC-12345", nit: "830.221.554-8", valor: 18420000, adj: true },
+  { id: "FVE-44821", emision: "21 may 2026", fn: "FVE", doc: "Factura de venta", pedido: "PVC-292314", oc: "OC-12346", nit: "830.221.554-8", valor: 18420000, adj: true },
+  { id: "FVE-44821", emision: "21 may 2026", fn: "FVE", doc: "Factura de venta", pedido: "PVC-292315", oc: "OC-12347", nit: "830.221.554-8", valor: 18420000, adj: true },
+  { id: "NC-1182", emision: "18 may 2026", fn: "NC", doc: "Nota crédito", pedido: "PVC-291786", oc: "OC-12348", nit: "830.221.554-8", valor: -1340000, adj: true },
+  { id: "FVE-44780", emision: "19 may 2026", fn: "FVE", doc: "Factura de venta", pedido: "PVC-292208", oc: "OC-12349", nit: "830.221.554-8", valor: 12750000, adj: true },
+  { id: "ND-0421", emision: "12 may 2026", fn: "ND", doc: "Nota débito", pedido: "PVC-290985", oc: "OC-12350",nit: "830.221.554-8", valor:54000, adj: false },
 ];
 const docsRemisiones: DocRemision[] = [
-  { id: "REM-2291", emision: "06 jun 2026", tipo: "Remisión", pedido: "T-292313", receptor: "Arturo Mosquera", cel: "3104458821", hora: "06 jun 2026 · 14:22", codigo: "#PAR-8842", firma: "ok", valor: 14820000 },
-  { id: "REM-2274", emision: "02 jun 2026", tipo: "Remisión", pedido: "T-292208", receptor: "Laura Gómez", cel: "3128840193", hora: "02 jun 2026 · 10:48", codigo: "#PAR-8821", firma: "ok", valor: 6720000 },
-  { id: "DEV-0455", emision: "27 may 2026", tipo: "Devolución", pedido: "T-291640", receptor: "Carolina Ruiz", cel: "3001129087", hora: "27 may 2026 · 16:05", codigo: "OPE-0455", firma: "ok", valor: -880000 },
+  { id: "REM-2291", emision: "06 jun 2026", tipo: "Remisión", pedido: "PVC-292313", receptor: "Arturo Mosquera", cel: "3104458821", hora: "06 jun 2026 · 14:22", codigo: "#PAR-8842", firma: "ok", valor: 14820000 },
+  { id: "REM-2274", emision: "02 jun 2026", tipo: "Remisión", pedido: "PVC-292208", receptor: "Laura Gómez", cel: "3128840193", hora: "02 jun 2026 · 10:48", codigo: "#PAR-8821", firma: "ok", valor: 6720000 },
+  { id: "DEV-0455", emision: "27 may 2026", tipo: "Devolución", pedido: "PVC-291640", receptor: "Carolina Ruiz", cel: "3001129087", hora: "27 may 2026 · 16:05", codigo: "OPE-0455", firma: "ok", valor: -880000 },
 ];
 const firmaEstados: Record<Firma, EstadoMeta> = {
   ok: { label: "Validada", pill: "green" },
