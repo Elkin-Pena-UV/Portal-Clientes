@@ -12,12 +12,17 @@ export interface Sede {
 
 export type TipoProducto = 'saco' | 'granel'
 
+/** Categoría de catálogo. Solo se subdivide visualmente para productos en saco. */
+export type CategoriaProducto = 'cemento' | 'linea_acabados'
+
 export interface Producto {
   id: string
   codigo: string
   nombre: string
   marca: string
   tipo: TipoProducto
+  /** Categoría para agrupar en el catálogo (aplica principalmente a "saco"). */
+  categoria: CategoriaProducto
   presentacion: string
   /** Unidad de medida, ej: "Bulto 50kg", "Ton", "m³" */
   unidad: string
