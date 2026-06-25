@@ -32,6 +32,7 @@ const NAV: NavGroup[] = [
   ]},
   { group: "Catálogo", items: [
     { id: "producto", label: "Producto", icon: "sheet" },
+    { id: "sedes", label: "Sedes", icon: "pin" },
   ]},
 ];
 
@@ -58,7 +59,8 @@ export function Sidebar({ collapsed, onToggle, onLogout }: {
             <div className="sb-group-label">{g.group}</div>
             {g.items.map((it) => {
               const Ic = Icon[it.icon];
-              const active = pathname === "/" + it.id;
+              const base = "/" + it.id;
+              const active = pathname === base || pathname.startsWith(base + "/");
               return (
                 <button
                   key={it.id}
