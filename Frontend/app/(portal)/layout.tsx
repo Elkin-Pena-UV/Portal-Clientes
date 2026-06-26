@@ -2,9 +2,9 @@
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Sidebar } from "@/components/Sidebar";
-import { Topbar } from "@/components/Topbar";
-import { Footer } from "@/components/Footer";
+import { Sidebar } from "@/components/layout/sidebar";
+import { Topbar } from "@/components/layout/topbar";
+import { Footer } from "@/components/layout/footer";
 import { Icon } from "@/components/icons";
 import { useAuth } from "@/contexts/auth";
 import { PortalProvider } from "@/components/portal-provider";

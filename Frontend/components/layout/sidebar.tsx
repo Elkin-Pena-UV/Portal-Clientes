@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { Icon, type IconName } from "@/components/icons";
 import { MP } from "@/lib/data";
-import { MLogo } from "@/components/ui";
+import { MLogo } from "@/components/shared/primitives";
 
 interface NavItem {
   id: string;

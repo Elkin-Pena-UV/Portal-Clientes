@@ -1,4 +1,4 @@
-/* Cementos San Marcos — componentes compartidos */
+/* Cementos San Marcos — primitivos compartidos (Pill, Checkbox, ProdImg, etc.) */
 import React from "react";
 import { Icon } from "@/components/icons";
 import { PROD_CATS, prodCat, type ProdLike } from "@/lib/prodThumb";

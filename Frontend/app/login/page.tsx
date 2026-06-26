@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/icons";
 import { MP } from "@/lib/data";
-import { MLogo } from "@/components/ui";
+import { MLogo } from "@/components/shared/primitives";
 import { useAuth } from "@/contexts/auth";
 
 export default function LoginPage() {
