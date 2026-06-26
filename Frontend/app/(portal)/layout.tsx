@@ -31,6 +31,7 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     setCollapsed(localStorage.getItem("sm_sidebar_collapsed") === "1");
@@ -39,6 +40,11 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (ready && !authed) router.replace("/login");
   }, [ready, authed, router]);
+
+  // Cierra el drawer móvil al cambiar de ruta
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   function toggleSidebar() {
     setCollapsed((c) => {
@@ -62,10 +68,20 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
 
   return (
     <PortalProvider>
-      <div className={"app" + (collapsed ? " collapsed" : "")} data-sb="light" style={{ "--dens": 1 } as CSSProperties}>
-        <Sidebar collapsed={collapsed} onToggle={toggleSidebar} onLogout={handleLogout} />
+      <div
+        className={"app" + (collapsed ? " collapsed" : "") + (mobileOpen ? " mobile-open" : "")}
+        data-sb="light"
+        style={{ "--dens": 1 } as CSSProperties}
+      >
+        <Sidebar
+          collapsed={collapsed}
+          onToggle={toggleSidebar}
+          onLogout={handleLogout}
+          onNavigate={() => setMobileOpen(false)}
+        />
+        <div className="sb-overlay" onClick={() => setMobileOpen(false)} aria-hidden="true" />
         <main className="main">
-          <Topbar title={meta.t} sub={meta.s} actions={actions} />
+          <Topbar title={meta.t} sub={meta.s} actions={actions} onMenu={() => setMobileOpen(true)} />
           <div className="content" key={seg}>
             {children}
             <Footer />

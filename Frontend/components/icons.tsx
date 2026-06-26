@@ -93,6 +93,7 @@ export const Icon = (function () {
     x: P("M6 6l12 12M18 6 6 18"),
     minus: P("M5 12h14"),
     filter: P("M3 5h18", "M6 12h12", "M10 19h4"),
+    menu: P("M4 6h16", "M4 12h16", "M4 18h16"),
     trash: P("M4 7h16", "M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2", "M6 7l1 13h10l1-13"),
     bolt: P("M13 2 4 14h7l-1 8 9-12h-7l1-8Z"),
     bag: raw([

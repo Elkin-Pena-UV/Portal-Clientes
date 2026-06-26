@@ -337,6 +337,16 @@ a { color: inherit; text-decoration: none; }
 .icon-btn svg { width: 18px; height: 18px; }
 .icon-btn .dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 999px; background: var(--orange); border: 1.5px solid var(--surface); }
 
+/* Botón hamburguesa (solo móvil) + overlay del drawer */
+.menu-btn {
+  display: none; width: 38px; height: 38px; flex: none;
+  border: 1px solid var(--line-strong); background: var(--surface);
+  border-radius: var(--radius-sm); color: var(--ink-2); place-items: center;
+}
+.menu-btn:hover { background: #F7F8FA; color: var(--ink); }
+.menu-btn svg { width: 20px; height: 20px; }
+.sb-overlay { display: none; }
+
 /* ---------------- Cards ---------------- */
 .card {
   background: var(--surface);
@@ -711,6 +721,16 @@ select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csv
 .content::-webkit-scrollbar-thumb { background: #D7DAE1; border-radius: 999px; border: 3px solid var(--bg); }
 .content::-webkit-scrollbar-track { background: transparent; }
 
+/* ============================================================
+   Responsive
+   - >  1024px : escritorio (sidebar fija)
+   - <= 1024px : tablet (grillas se reducen)
+   - <=  860px : móvil (sidebar = drawer off-canvas + hamburguesa)
+   ============================================================ */
+
+@media (max-width: 1180px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 1080px) {
   .acc-grid { grid-template-columns: repeat(2, 1fr); }
 }
@@ -726,4 +746,77 @@ select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csv
   .login-brand { display: none; }
   .af-inner { flex-direction: column; }
   .af-links { align-items: flex-start; text-align: left; }
+}
+
+/* ---------------- Móvil: drawer + ajustes de chrome ---------------- */
+@media (max-width: 860px) {
+  /* Shell a una sola columna; la sidebar pasa a drawer fuera de pantalla */
+  .app, .app.collapsed { grid-template-columns: 1fr; --sidebar-w: 280px; }
+
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: 280px; max-width: 84vw; z-index: 70;
+    transform: translateX(-100%);
+    transition: transform .24s ease;
+  }
+  .app.mobile-open .sidebar { transform: translateX(0); box-shadow: 0 18px 48px rgba(20, 26, 35, .22); }
+
+  /* En móvil el drawer siempre se ve expandido aunque "collapsed" esté activo */
+  .app.collapsed .sb-brand { flex-wrap: nowrap; justify-content: flex-start; padding: 22px 22px 18px; gap: 11px; }
+  .app.collapsed .sb-brand .name { display: block; }
+  .app.collapsed .sb-nav { padding: 6px 14px 14px; }
+  .app.collapsed .sb-group-label { display: block; }
+  .app.collapsed .sb-group { margin-top: 18px; padding-top: 0; border-top: none; }
+  .app.collapsed .sb-group:first-child { margin-top: 4px; }
+  .app.collapsed .sb-item { justify-content: flex-start; padding: 9px 10px; }
+  .app.collapsed .sb-item .label { display: block; }
+  .app.collapsed .sb-item .sb-badge { position: static; top: auto; right: auto; }
+  .app.collapsed .sb-user { justify-content: flex-start; padding: 14px 16px; }
+  .app.collapsed .sb-user .meta { display: block; }
+  .app.collapsed .sb-user .logout { display: grid; }
+
+  /* El botón colapsar no aplica en móvil */
+  .sb-toggle { display: none; }
+
+  /* Overlay oscuro detrás del drawer */
+  .sb-overlay {
+    display: block; position: fixed; inset: 0; z-index: 60;
+    background: rgba(20, 26, 35, .45);
+    opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  .app.mobile-open .sb-overlay { opacity: 1; pointer-events: auto; }
+
+  /* Topbar con hamburguesa */
+  .menu-btn { display: grid; }
+  .topbar { padding: 12px 16px; gap: 12px; }
+  .topbar h1 { font-size: 17px; }
+  .topbar .sub { display: none; }
+  .topbar .actions { gap: 8px; }
+
+  /* Padding de contenido más compacto */
+  .content { padding: 18px 16px 44px; }
+
+  /* Pestañas desplazables en vez de envolver/desbordar */
+  .tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { white-space: nowrap; flex: none; }
+
+  /* La barra de pago envuelve en pantallas chicas */
+  .paybar { flex-wrap: wrap; padding: 14px 16px; gap: 12px; }
+  .paybar .sum { flex: 1 1 100%; }
+  .paybar .btn { width: 100%; justify-content: center; }
+
+  /* Buscadores y cabeceras de tarjeta ocupan todo el ancho */
+  .search { width: 100%; }
+  .search input { width: 100%; }
+  .between { flex-wrap: wrap; }
+  .card-head { flex-wrap: wrap; }
+
+  /* Grillas de catálogo / anticipos a una columna */
+  .prod-grid { grid-template-columns: 1fr; }
+  .field-row { grid-template-columns: 1fr; }
+
+  /* Stepper compacto: oculta los subtítulos largos */
+  .step .s-txt span { display: none; }
+  .step-line { margin: 0 8px; min-width: 14px; }
 }

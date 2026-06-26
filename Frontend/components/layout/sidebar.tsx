@@ -36,10 +36,11 @@ const NAV: NavGroup[] = [
   ]},
 ];
 
-export function Sidebar({ collapsed, onToggle, onLogout }: {
+export function Sidebar({ collapsed, onToggle, onLogout, onNavigate }: {
   collapsed: boolean;
   onToggle: () => void;
   onLogout: () => void;
+  onNavigate?: () => void;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -65,7 +66,7 @@ export function Sidebar({ collapsed, onToggle, onLogout }: {
                 <button
                   key={it.id}
                   className={"sb-item" + (active ? " active" : "")}
-                  onClick={() => router.push("/" + it.id)}
+                  onClick={() => { router.push("/" + it.id); onNavigate?.(); }}
                   title={collapsed ? it.label : undefined}
                 >
                   <Ic />
