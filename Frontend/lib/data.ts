@@ -116,6 +116,7 @@ export interface Pago {
   fecha: string;
   valor: number;
   moneda: string;
+  metodo: string;
   site: string;
 }
 
@@ -139,6 +140,7 @@ export type FactEstado = "vigente" | "porvencer" | "vencida";
 export interface Factura {
   id: string;
   venc: string;
+  vencISO: string;
   valor: number;
   estado: FactEstado;
 }
@@ -285,11 +287,11 @@ const progEstados: Record<ProgEstado, EstadoMeta> = {
 
 // Pagos — historial (anticipos / abonos)
 const pagos: Pago[] = [
-  { reg: "21/11/2025 11:05", motivo: "ANTICIPO", codigo: "245", estado: "rechazado", fecha: "21/11/2025", valor: 1000000, moneda: "COP", site: "Recaudo anticipo en línea" },
-  { reg: "19/10/2025 08:54", motivo: "ANTICIPO", codigo: "207", estado: "rechazado", fecha: "19/10/2025", valor: 2040000, moneda: "COP", site: "Recaudo anticipo en línea" },
-  { reg: "19/10/2025 08:53", motivo: "ANTICIPO", codigo: "206", estado: "confirmado", fecha: "19/10/2025", valor: 1382000, moneda: "COP", site: "Recaudo anticipo en línea" },
-  { reg: "11/08/2025 03:02", motivo: "ABONO", codigo: "138", estado: "confirmado", fecha: "11/08/2025", valor: 12500000, moneda: "COP", site: "Recaudo anticipo en línea" },
-  { reg: "06/07/2025 02:32", motivo: "ANTICIPO", codigo: "92", estado: "confirmado", fecha: "06/07/2025", valor: 5400000, moneda: "COP", site: "Recaudo anticipo en línea" },
+  { reg: "21/11/2025 11:05", motivo: "ANTICIPO", codigo: "245", estado: "rechazado", fecha: "21/11/2025", valor: 1000000, moneda: "COP", metodo: "PSE", site: "Recaudo anticipo en línea" },
+  { reg: "19/10/2025 08:54", motivo: "ANTICIPO", codigo: "207", estado: "rechazado", fecha: "19/10/2025", valor: 2040000, moneda: "COP", metodo: "PSE", site: "Recaudo anticipo en línea" },
+  { reg: "19/10/2025 08:53", motivo: "ANTICIPO", codigo: "206", estado: "confirmado", fecha: "19/10/2025", valor: 1382000, moneda: "COP", metodo: "PSE", site: "Recaudo anticipo en línea" },
+  { reg: "11/08/2025 03:02", motivo: "ABONO", codigo: "138", estado: "confirmado", fecha: "11/08/2025", valor: 12500000, moneda: "COP", metodo: "Transferencia", site: "Recaudo anticipo en línea" },
+  { reg: "06/07/2025 02:32", motivo: "ANTICIPO", codigo: "92", estado: "confirmado", fecha: "06/07/2025", valor: 5400000, moneda: "COP", metodo: "Tarjeta de crédito", site: "Recaudo anticipo en línea" },
 ];
 const pagoEstados: Record<PagoEstado, EstadoMeta> = {
   rechazado: { label: "RECHAZADO", pill: "red" },
@@ -312,11 +314,11 @@ const platEstados: Record<Plataforma, PillKind> = {
 
 // Facturas por pagar (cartera)
 const facturas: Factura[] = [
-  { id: "FVE-44821", venc: "11 jun 2026", valor: 18420000, estado: "porvencer" },
-  { id: "FVE-44780", venc: "18 jun 2026", valor: 12750000, estado: "vigente" },
-  { id: "FVE-44712", venc: "05 jun 2026", valor: 9680000, estado: "vencida" },
-  { id: "FVE-44698", venc: "27 jun 2026", valor: 22100000, estado: "vigente" },
-  { id: "FVE-44655", venc: "02 jun 2026", valor: 7300000, estado: "vencida" },
+  { id: "FVE-44821", venc: "11 jun 2026", vencISO: "2026-06-11", valor: 18420000, estado: "porvencer" },
+  { id: "FVE-44780", venc: "18 jun 2026", vencISO: "2026-06-18", valor: 12750000, estado: "vigente" },
+  { id: "FVE-44712", venc: "05 jun 2026", vencISO: "2026-06-05", valor: 9680000, estado: "vencida" },
+  { id: "FVE-44698", venc: "27 jun 2026", vencISO: "2026-06-27", valor: 22100000, estado: "vigente" },
+  { id: "FVE-44655", venc: "02 jun 2026", vencISO: "2026-06-02", valor: 7300000, estado: "vencida" },
 ];
 const factEstados: Record<FactEstado, EstadoMeta> = {
   vigente: { label: "Vigente", pill: "green" },

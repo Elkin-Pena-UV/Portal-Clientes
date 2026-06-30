@@ -4,39 +4,36 @@ import { useState } from "react";
 import { Icon } from "@/components/icons";
 import { MP, type Factura } from "@/lib/data";
 import { CupoKpis } from "@/components/pagos/cupo-kpis";
-import { PagarCartera } from "@/components/pagos/pagar-cartera";
-import { CarteraEdades } from "@/components/pagos/cartera-edades";
+import { EstadoCartera } from "@/components/pagos/estado-cartera";
+import { PagarFacturas } from "@/components/pagos/pagar-facturas";
+import { PagosAnticipos } from "@/components/pagos/pagos-anticipos";
 import { HistorialPagos } from "@/components/pagos/historial-pagos";
-import { SolicitudesPse } from "@/components/pagos/solicitudes-pse";
 import { PagoExitoso } from "@/components/pagos/pago-exitoso";
 
-type TabPago = "pagar" | "edades" | "historial" | "solicitudes";
+type TabPago = "estado" | "pagar" | "anticipos" | "historial";
 
 const TABS: { id: TabPago; label: string }[] = [
-  { id: "pagar", label: "Pagar cartera" },
-  { id: "edades", label: "Cartera por edades" },
+  { id: "estado", label: "Estado de cartera" },
+  { id: "pagar", label: "Pagar facturas" },
+  { id: "anticipos", label: "Pagos de anticipos" },
   { id: "historial", label: "Historial de pagos" },
-  { id: "solicitudes", label: "Solicitudes PSE" },
 ];
 
 export function PagosView() {
-  const [tab, setTab] = useState<TabPago>("pagar");
+  const [tab, setTab] = useState<TabPago>("estado");
   const [sel, setSel] = useState<Record<string, boolean>>({});
   const [montos, setMontos] = useState<Record<string, number>>({});
-  const [antAplic, setAntAplic] = useState<Record<string, boolean>>({});
-  const [paid, setPaid] = useState(false);
+  const [paid, setPaid] = useState<number | null>(null);
 
   const seleccionadas = MP.facturas.filter((f) => sel[f.id]);
   const montoDe = (f: Factura) => (sel[f.id] ? (montos[f.id] != null ? montos[f.id] : f.valor) : 0);
-  const totalFacturas = seleccionadas.reduce((s, f) => s + montoDe(f), 0);
-  const antAplicado = Math.min(MP.anticipos.filter((a) => antAplic[a.id]).reduce((s, a) => s + a.valor, 0), totalFacturas);
-  const totalPagar = Math.max(0, totalFacturas - antAplicado);
+  const totalPagar = seleccionadas.reduce((s, f) => s + montoDe(f), 0);
 
-  if (paid) {
+  if (paid != null) {
     return (
       <PagoExitoso
-        totalPagar={totalPagar}
-        onVerSolicitudes={() => { setPaid(false); setSel({}); setTab("solicitudes"); }}
+        totalPagar={paid}
+        onVerEstado={() => { setPaid(null); setSel({}); setTab("estado"); }}
       />
     );
   }
@@ -52,26 +49,25 @@ export function PagosView() {
           </div>
         </div>
 
+        {tab === "estado" && <EstadoCartera />}
         {tab === "pagar" && (
-          <PagarCartera
+          <PagarFacturas
             sel={sel} setSel={setSel}
             montos={montos} setMontos={setMontos}
-            antAplic={antAplic} setAntAplic={setAntAplic}
           />
         )}
-        {tab === "edades" && <CarteraEdades />}
+        {tab === "anticipos" && <PagosAnticipos onPagar={(monto) => setPaid(monto)} />}
         {tab === "historial" && <HistorialPagos />}
-        {tab === "solicitudes" && <SolicitudesPse />}
       </div>
 
       {tab === "pagar" && (
         <>
           <div className="paybar">
             <div className="sum">
-              <div className="lbl">{seleccionadas.length} factura(s) · {MP.COP(totalFacturas)}{antAplicado > 0 ? "  − anticipos " + MP.COP(antAplicado) : ""}</div>
+              <div className="lbl">{seleccionadas.length} factura(s) seleccionada(s)</div>
               <div className="amt">{MP.COP(totalPagar)}</div>
             </div>
-            <button className="btn btn-secondary" disabled={totalPagar === 0} onClick={() => setPaid(true)}><Icon.lock /> Pagar con PSE</button>
+            <button className="btn btn-secondary" disabled={totalPagar === 0} onClick={() => setPaid(totalPagar)}><Icon.lock /> Pagar con PSE</button>
           </div>
           <div className="muted-note">
             <Icon.info />Al retornar de la pasarela PSE, la solicitud queda en estado CREATED y se cruza automáticamente cuando la plataforma confirma (OK).

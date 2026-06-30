@@ -1,50 +1,61 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
+import { Icon } from "@/components/icons";
 import { MP, type Factura } from "@/lib/data";
 import { Pill, Checkbox } from "@/components/shared/primitives";
 
-export function PagarCartera({ sel, setSel, montos, setMontos, antAplic, setAntAplic }: {
+export function PagarFacturas({ sel, setSel, montos, setMontos }: {
   sel: Record<string, boolean>;
   setSel: Dispatch<SetStateAction<Record<string, boolean>>>;
   montos: Record<string, number>;
   setMontos: Dispatch<SetStateAction<Record<string, number>>>;
-  antAplic: Record<string, boolean>;
-  setAntAplic: Dispatch<SetStateAction<Record<string, boolean>>>;
 }) {
-  const antDisponible = MP.anticipos.reduce((s, a) => s + a.valor, 0);
+  const [q, setQ] = useState("");
+  const [desde, setDesde] = useState("");
+  const [hasta, setHasta] = useState("");
+
   const montoDe = (f: Factura) => (sel[f.id] ? (montos[f.id] != null ? montos[f.id] : f.valor) : 0);
-  const allOn = MP.facturas.every((f) => sel[f.id]);
+
+  const term = q.trim().toLowerCase();
+  const lista = MP.facturas.filter((f) =>
+    (term ? f.id.toLowerCase().includes(term) : true) &&
+    (desde ? f.vencISO >= desde : true) &&
+    (hasta ? f.vencISO <= hasta : true)
+  );
+  const allOn = lista.length > 0 && lista.every((f) => sel[f.id]);
 
   const toggle = (id: string) => setSel((s) => ({ ...s, [id]: !s[id] }));
-  const toggleAnt = (id: string) => setAntAplic((s) => ({ ...s, [id]: !s[id] }));
   const toggleAll = () => {
     const v = !allOn;
-    const n: Record<string, boolean> = {};
-    MP.facturas.forEach((f) => (n[f.id] = v));
-    setSel(n);
+    setSel((s) => {
+      const n = { ...s };
+      lista.forEach((f) => (n[f.id] = v));
+      return n;
+    });
   };
 
   return (
     <>
-      <div className="card-pad" style={{ borderBottom: "1px solid var(--line)" }}>
-        <div className="between" style={{ marginBottom: 12 }}>
-          <div className="section-title" style={{ fontSize: 14, margin: 0 }}>Anticipos disponibles para aplicar</div>
-          <span className="pill green" style={{ fontWeight: 800 }}>{MP.COP(antDisponible)} disponibles</span>
+      <div className="card-head" style={{ borderBottom: "none", paddingBottom: 4 }}>
+        <h3>Pagar facturas</h3>
+        <div className="spacer" />
+        <div className="search">
+          <Icon.search />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por N.º de factura…" />
         </div>
-        <div className="ant-grid">
-          {MP.anticipos.map((a) => (
-            <button key={a.id} type="button" className={"ant-card" + (antAplic[a.id] ? " on" : "")} onClick={() => toggleAnt(a.id)}>
-              <Checkbox on={!!antAplic[a.id]} onClick={() => toggleAnt(a.id)} />
-              <div className="ant-tx">
-                <b className="t-mono">{MP.COP(a.valor)}</b>
-                <span>{a.id} · {a.fecha}</span>
-              </div>
-            </button>
-          ))}
+        <div className="search" style={{ width: "auto" }}>
+          <Icon.calendar />
+          <input type="date" value={desde} max={hasta || undefined} onChange={(e) => setDesde(e.target.value)} style={{ width: "auto" }} aria-label="Fecha desde" />
+          <span className="t-muted" style={{ padding: "0 2px" }}>–</span>
+          <input type="date" value={hasta} min={desde || undefined} onChange={(e) => setHasta(e.target.value)} style={{ width: "auto" }} aria-label="Fecha hasta" />
         </div>
+        {(q || desde || hasta) && (
+          <button className="btn btn-quiet btn-sm" onClick={() => { setQ(""); setDesde(""); setHasta(""); }}><Icon.x /> Limpiar</button>
+        )}
       </div>
-      <div className="tbl-wrap">
+
+      <div className="tbl-wrap" style={{ borderTop: "1px solid var(--line)" }}>
         <table className="tbl">
           <thead><tr>
             <th style={{ width: 44 }}><Checkbox on={allOn} onClick={toggleAll} /></th>
@@ -52,7 +63,7 @@ export function PagarCartera({ sel, setSel, montos, setMontos, antAplic, setAntA
             <th className="num" style={{ width: 180 }}>Monto a pagar</th><th>Estado</th>
           </tr></thead>
           <tbody>
-            {MP.facturas.map((f) => (
+            {lista.map((f) => (
               <tr key={f.id} style={sel[f.id] ? { background: "var(--orange-light)" } : undefined}>
                 <td><Checkbox on={!!sel[f.id]} onClick={() => toggle(f.id)} /></td>
                 <td className="t-strong t-mono">{f.id}</td>
@@ -75,6 +86,7 @@ export function PagarCartera({ sel, setSel, montos, setMontos, antAplic, setAntA
             ))}
           </tbody>
         </table>
+        {lista.length === 0 && <div className="empty">No hay facturas que coincidan con los filtros.</div>}
       </div>
     </>
   );

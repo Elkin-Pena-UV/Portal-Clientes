@@ -3,9 +3,9 @@
 import { Icon } from "@/components/icons";
 import { MP } from "@/lib/data";
 
-export function PagoExitoso({ totalPagar, onVerSolicitudes }: {
+export function PagoExitoso({ totalPagar, onVerEstado }: {
   totalPagar: number;
-  onVerSolicitudes: () => void;
+  onVerEstado: () => void;
 }) {
   return (
     <div className="content-inner">
@@ -14,7 +14,7 @@ export function PagoExitoso({ totalPagar, onVerSolicitudes }: {
         <h2 style={{ margin: "0 0 8px", fontSize: 23, fontWeight: 800 }}>Pago registrado</h2>
         <p className="t-muted" style={{ maxWidth: "48ch", margin: "0 auto 6px" }}>Tu pago por <b style={{ color: "var(--ink)" }}>{MP.COP(totalPagar)}</b> fue recibido vía PSE y la solicitud quedó en estado <b style={{ color: "var(--ink)" }}>CREATED</b>.</p>
         <p className="t-muted" style={{ maxWidth: "52ch", margin: "0 auto 24px", fontSize: 13.5 }}>Al confirmarse en la plataforma, el documento se cruza automáticamente y libera cupo.</p>
-        <button className="btn btn-ghost" onClick={onVerSolicitudes}>Ver solicitudes PSE</button>
+        <button className="btn btn-ghost" onClick={onVerEstado}>Ver estado de cartera</button>
       </div>
     </div>
   );
