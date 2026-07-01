@@ -10,6 +10,9 @@ import { datosEntregaVacios, datosRetiraVacios } from '@/lib/types'
 import { hoyInicio } from '@/lib/order-utils'
 import { toFechaISO } from '@/lib/format'
 import {
+  COLOR_AZUL,
+  COLOR_BLANCO,
+  COLOR_NARANJA,
   COLUMNAS,
   MAX_FILAS,
   type ErrorFila,
@@ -407,13 +410,52 @@ export function procesarFilas(
   }
 }
 
-/** Genera un reporte CSV de errores para descargar. */
-export function generarReporteErrores(errores: ErrorFila[]): Blob {
-  const head = 'Fila,Columna,Severidad,Mensaje'
-  const lines = errores.map((e) => {
-    const msg = `"${e.mensaje.replace(/"/g, '""')}"`
-    return `${e.fila || ''},"${e.columna}",${e.severidad},${msg}`
+/** Genera un reporte Excel (.xlsx) de errores para descargar. */
+export async function generarReporteErrores(errores: ErrorFila[]): Promise<Blob> {
+  const wb = new ExcelJS.Workbook()
+  wb.creator = 'CementoYa'
+  wb.created = new Date()
+
+  const ws = wb.addWorksheet('Errores', {
+    views: [{ state: 'frozen', ySplit: 1 }],
   })
-  const csv = [head, ...lines].join('\n')
-  return new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+
+  ws.columns = [
+    { key: 'fila', header: 'Fila', width: 10 },
+    { key: 'columna', header: 'Columna', width: 34 },
+    { key: 'severidad', header: 'Severidad', width: 16 },
+    { key: 'mensaje', header: 'Detalle', width: 70 },
+  ]
+
+  // Encabezado con estilo corporativo.
+  const headerRow = ws.getRow(1)
+  headerRow.eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: COLOR_BLANCO }, size: 11 }
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: COLOR_AZUL },
+    }
+    cell.alignment = { vertical: 'middle', horizontal: 'left' }
+  })
+  headerRow.height = 24
+
+  errores.forEach((e) => {
+    const row = ws.addRow({
+      fila: e.fila || '',
+      columna: e.columna,
+      severidad: e.severidad,
+      mensaje: e.mensaje,
+    })
+    row.getCell('severidad').font = {
+      bold: true,
+      color: { argb: e.severidad === 'error' ? COLOR_NARANJA : COLOR_AZUL },
+    }
+    row.getCell('mensaje').alignment = { wrapText: true, vertical: 'top' }
+  })
+
+  const buffer = await wb.xlsx.writeBuffer()
+  return new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  })
 }
