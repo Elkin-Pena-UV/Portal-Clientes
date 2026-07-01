@@ -33,6 +33,8 @@ interface SedeComboboxProps {
   placeholder?: string
   invalid?: boolean
   id?: string
+  /** Muestra la acción "Agregar nueva sede". Por defecto true. */
+  showAgregarSede?: boolean
 }
 
 export function SedeCombobox({
@@ -41,6 +43,7 @@ export function SedeCombobox({
   placeholder = 'Selecciona una sede',
   invalid,
   id,
+  showAgregarSede = true,
 }: SedeComboboxProps) {
   const { sedes, solicitarCrearSede } = usePortal()
   const router = useRouter()
@@ -135,16 +138,18 @@ export function SedeCombobox({
             </CommandGroup>
           </CommandList>
           {/* Acción fija: siempre visible, incluso sin resultados */}
-          <button
-            type="button"
-            onClick={handleAgregarSede}
-            className="flex w-full items-center gap-2 border-t bg-[#ff6600]/10 px-3 py-2.5 text-left text-sm font-medium text-[#ff6600] outline-none transition-colors hover:bg-[#ff6600]/20 focus-visible:bg-[#ff6600]/20"
-          >
-            <span className="flex size-5 items-center justify-center rounded-full bg-[#ff6600]/15">
-              <Plus className="size-3.5" />
-            </span>
-            Agregar nueva sede
-          </button>
+          {showAgregarSede && (
+            <button
+              type="button"
+              onClick={handleAgregarSede}
+              className="flex w-full items-center gap-2 border-t bg-[#ff6600]/10 px-3 py-2.5 text-left text-sm font-medium text-[#ff6600] outline-none transition-colors hover:bg-[#ff6600]/20 focus-visible:bg-[#ff6600]/20"
+            >
+              <span className="flex size-5 items-center justify-center rounded-full bg-[#ff6600]/15">
+                <Plus className="size-3.5" />
+              </span>
+              Agregar nueva sede
+            </button>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
