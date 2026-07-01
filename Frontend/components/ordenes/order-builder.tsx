@@ -20,18 +20,34 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card'
 
 export function OrderBuilder() {
-  const { getProducto, consumirBorradorImportado } = usePortal()
+  const {
+    getProducto,
+    consumirBorradorImportado,
+    mirrorBorradorPedidos,
+    consumirRestaurarBorrador,
+  } = usePortal()
   const [pedidos, setPedidos] = React.useState<Pedido[]>(() => [nuevoPedido()])
   const [openId, setOpenId] = React.useState<string>(() => pedidos[0].id)
   const [showErrors, setShowErrors] = React.useState(false)
   const [submitting, setSubmitting] = React.useState(false)
   const [confirmed, setConfirmed] = React.useState(false)
 
-  // Cargar un lote importado desde la plantilla Excel, si existe.
+  // Restaurar el borrador preservado al volver de "Agregar nueva sede".
   React.useEffect(() => {
+    const restaurado = consumirRestaurarBorrador()
+    if (restaurado && restaurado.length) {
+      setPedidos(restaurado)
+      setOpenId(restaurado[0].id)
+      toast.info('Recuperamos tu pedido en progreso.')
+      return
+    }
+    // Si no hay restauración, cargar un lote importado desde Excel (si existe).
     const borrador = consumirBorradorImportado()
     if (borrador && borrador.length) {
       setPedidos(borrador)
@@ -42,7 +58,12 @@ export function OrderBuilder() {
         } desde la plantilla para edición.`,
       )
     }
-  }, [consumirBorradorImportado])
+  }, [consumirBorradorImportado, consumirRestaurarBorrador])
+
+  // Mantener un espejo del borrador para preservarlo al navegar a otra ruta.
+  React.useEffect(() => {
+    mirrorBorradorPedidos(pedidos)
+  }, [pedidos, mirrorBorradorPedidos])
 
   const totalPedidos = pedidos.length
   const totalUnidadesGlobal = pedidos.reduce((acc, p) => acc + totalUnidades(p), 0)

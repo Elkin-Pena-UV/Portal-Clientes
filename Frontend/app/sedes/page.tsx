@@ -51,11 +51,20 @@ import {
 } from '@/components/ui/table'
 
 export default function SedesPage() {
-  const { sedes, deleteSede } = usePortal()
+  const { sedes, deleteSede, consumirAbrirNuevaSede } = usePortal()
   const [query, setQuery] = React.useState('')
   const [formOpen, setFormOpen] = React.useState(false)
   const [editing, setEditing] = React.useState<Sede | null>(null)
   const [toDelete, setToDelete] = React.useState<Sede | null>(null)
+
+  // Si llegamos desde el flujo "Agregar nueva sede" del pedido, abrir el formulario.
+  React.useEffect(() => {
+    if (consumirAbrirNuevaSede()) {
+      setEditing(null)
+      setFormOpen(true)
+      toast.info('Crea la sede y espera confirmación para seleccionarla.')
+    }
+  }, [consumirAbrirNuevaSede])
 
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase()

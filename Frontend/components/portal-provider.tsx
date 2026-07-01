@@ -16,6 +16,17 @@ interface PortalContextValue {
   setBorradorImportado: (pedidos: Pedido[]) => void
   /** Devuelve y limpia el lote importado (uso único al abrir "Crear pedido"). */
   consumirBorradorImportado: () => Pedido[] | null
+  /** Espejo en vivo del borrador del pedido en construcción (para preservarlo al navegar). */
+  mirrorBorradorPedidos: (pedidos: Pedido[]) => void
+  /**
+   * Solicita crear una nueva sede desde el flujo de pedido: marca que al volver
+   * se debe restaurar el borrador y que la página de Sedes debe abrir el formulario.
+   */
+  solicitarCrearSede: () => void
+  /** La página de Sedes consume esto en su montaje para abrir el formulario de creación. */
+  consumirAbrirNuevaSede: () => boolean
+  /** El constructor consume esto al volver para restaurar el borrador preservado. */
+  consumirRestaurarBorrador: () => Pedido[] | null
 }
 
 const PortalContext = React.createContext<PortalContextValue | null>(null)
@@ -28,6 +39,10 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
   const [sedes, setSedes] = React.useState<Sede[]>(sedesMock)
   const [productos] = React.useState<Producto[]>(productosMock)
   const borradorRef = React.useRef<Pedido[] | null>(null)
+  // Espejo del borrador en construcción + banderas para el flujo "crear sede".
+  const borradorPedidosRef = React.useRef<Pedido[] | null>(null)
+  const abrirNuevaSedeRef = React.useRef(false)
+  const restaurarBorradorRef = React.useRef(false)
 
   const setBorradorImportado = React.useCallback((pedidos: Pedido[]) => {
     borradorRef.current = pedidos
@@ -37,6 +52,27 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
     const b = borradorRef.current
     borradorRef.current = null
     return b
+  }, [])
+
+  const mirrorBorradorPedidos = React.useCallback((pedidos: Pedido[]) => {
+    borradorPedidosRef.current = pedidos
+  }, [])
+
+  const solicitarCrearSede = React.useCallback(() => {
+    abrirNuevaSedeRef.current = true
+    restaurarBorradorRef.current = true
+  }, [])
+
+  const consumirAbrirNuevaSede = React.useCallback(() => {
+    const v = abrirNuevaSedeRef.current
+    abrirNuevaSedeRef.current = false
+    return v
+  }, [])
+
+  const consumirRestaurarBorrador = React.useCallback(() => {
+    if (!restaurarBorradorRef.current) return null
+    restaurarBorradorRef.current = false
+    return borradorPedidosRef.current
   }, [])
 
   const addSede = React.useCallback((sede: Omit<Sede, 'id'>) => {
@@ -75,6 +111,10 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
       getProducto,
       setBorradorImportado,
       consumirBorradorImportado,
+      mirrorBorradorPedidos,
+      solicitarCrearSede,
+      consumirAbrirNuevaSede,
+      consumirRestaurarBorrador,
     }),
     [
       sedes,
@@ -86,6 +126,10 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
       getProducto,
       setBorradorImportado,
       consumirBorradorImportado,
+      mirrorBorradorPedidos,
+      solicitarCrearSede,
+      consumirAbrirNuevaSede,
+      consumirRestaurarBorrador,
     ],
   )
 

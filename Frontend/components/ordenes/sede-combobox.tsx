@@ -1,7 +1,15 @@
 'use client'
 
 import * as React from 'react'
-import { Building2, Check, ChevronsUpDown, MapPin, Store } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import {
+  Building2,
+  Check,
+  ChevronsUpDown,
+  MapPin,
+  Plus,
+  Store,
+} from 'lucide-react'
 import { usePortal } from '@/components/portal-provider'
 import { Button } from '@/components/ui/button'
 import {
@@ -34,11 +42,24 @@ export function SedeCombobox({
   invalid,
   id,
 }: SedeComboboxProps) {
-  const { sedes } = usePortal()
+  const { sedes, solicitarCrearSede } = usePortal()
+  const router = useRouter()
   const [open, setOpen] = React.useState(false)
   const selected = sedes.find((s) => s.id === value)
 
+  const direccionCompleta = selected
+    ? [selected.direccion, selected.ciudad].filter(Boolean).join(', ')
+    : ''
+
+  function handleAgregarSede() {
+    setOpen(false)
+    // Marca que al volver se debe restaurar el borrador y abrir el formulario de sede.
+    solicitarCrearSede()
+    router.push('/sedes')
+  }
+
   return (
+    <div className="flex flex-col gap-1.5">
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         render={
@@ -76,9 +97,9 @@ export function SedeCombobox({
           <CommandInput placeholder="Buscar sede..." />
           <CommandList>
             <CommandEmpty>
-              <span className="flex flex-col items-center gap-1 py-2 text-sm">
+              <span className="flex flex-col items-center gap-1 py-2 text-sm text-muted-foreground">
                 <MapPin className="size-4" />
-                No se encontraron sedes.
+                No se encontraron sedes con ese nombre.
               </span>
             </CommandEmpty>
             <CommandGroup>
@@ -113,8 +134,27 @@ export function SedeCombobox({
               ))}
             </CommandGroup>
           </CommandList>
+          {/* Acción fija: siempre visible, incluso sin resultados */}
+          <button
+            type="button"
+            onClick={handleAgregarSede}
+            className="flex w-full items-center gap-2 border-t bg-[#ff6600]/10 px-3 py-2.5 text-left text-sm font-medium text-[#ff6600] outline-none transition-colors hover:bg-[#ff6600]/20 focus-visible:bg-[#ff6600]/20"
+          >
+            <span className="flex size-5 items-center justify-center rounded-full bg-[#ff6600]/15">
+              <Plus className="size-3.5" />
+            </span>
+            Agregar nueva sede
+          </button>
         </Command>
       </PopoverContent>
     </Popover>
+
+      {selected && direccionCompleta && (
+        <p className="flex items-start gap-1.5 text-sm text-muted-foreground">
+          <MapPin className="mt-0.5 size-4 shrink-0 text-[#00359a]" />
+          <span className="text-pretty">{direccionCompleta}</span>
+        </p>
+      )}
+    </div>
   )
 }
