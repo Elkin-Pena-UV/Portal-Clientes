@@ -24,9 +24,9 @@ interface ValidationErrorsProps {
 export function ValidationErrors({ errores }: ValidationErrorsProps) {
   if (errores.length === 0) return null
 
-  function descargarReporte() {
-    const blob = generarReporteErrores(errores)
-    descargarBlob(blob, 'CementoYa_Reporte_Errores.csv')
+  async function descargarReporte() {
+    const blob = await generarReporteErrores(errores)
+    descargarBlob(blob, 'CementoYa_Reporte_Errores.xlsx')
   }
 
   return (
@@ -90,7 +90,7 @@ export function ValidationErrors({ errores }: ValidationErrorsProps) {
           className="self-start"
         >
           <Download data-icon="inline-start" />
-          Descargar reporte de errores (CSV)
+          Descargar reporte de errores (Excel)
         </Button>
       </AlertDescription>
     </Alert>

@@ -37,6 +37,7 @@ export function PagosAnticipos({ onPagar }: { onPagar: (monto: number) => void }
                 value={sedeId}
                 onChange={setSedeId}
                 placeholder="Selecciona una sede"
+                showAgregarSede={false}
               />
             </Field>
 

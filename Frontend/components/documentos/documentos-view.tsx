@@ -12,6 +12,12 @@ export function DocumentosView() {
   const [sel, setSel] = useState<Record<string, boolean>>({});
   const [preview, setPreview] = useState<DocRemision | null>(null);
   const toggle = (id: string) => setSel((s) => ({ ...s, [id]: !s[id] }));
+  const toggleAll = (keys: string[], value: boolean) =>
+    setSel((s) => {
+      const next = { ...s };
+      for (const k of keys) next[k] = value;
+      return next;
+    });
   const count = Object.values(sel).filter(Boolean).length;
 
   return (
@@ -30,8 +36,8 @@ export function DocumentosView() {
           </div>
         </div>
 
-        {tab === "facturas" && <FacturasTable sel={sel} onToggle={toggle} />}
-        {tab === "remisiones" && <RemisionesTable sel={sel} onToggle={toggle} onPreview={setPreview} />}
+        {tab === "facturas" && <FacturasTable sel={sel} onToggle={toggle} onToggleAll={toggleAll} />}
+        {tab === "remisiones" && <RemisionesTable sel={sel} onToggle={toggle} onToggleAll={toggleAll} onPreview={setPreview} />}
       </div>
 
       {preview && <RemisionModal doc={preview} onClose={() => setPreview(null)} />}

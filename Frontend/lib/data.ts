@@ -139,6 +139,8 @@ export type FactEstado = "vigente" | "porvencer" | "vencida";
 
 export interface Factura {
   id: string;
+  emision: string;
+  emisionISO: string;
   venc: string;
   vencISO: string;
   valor: number;
@@ -314,11 +316,11 @@ const platEstados: Record<Plataforma, PillKind> = {
 
 // Facturas por pagar (cartera)
 const facturas: Factura[] = [
-  { id: "FVE-44821", venc: "11 jun 2026", vencISO: "2026-06-11", valor: 18420000, estado: "porvencer" },
-  { id: "FVE-44780", venc: "18 jun 2026", vencISO: "2026-06-18", valor: 12750000, estado: "vigente" },
-  { id: "FVE-44712", venc: "05 jun 2026", vencISO: "2026-06-05", valor: 9680000, estado: "vencida" },
-  { id: "FVE-44698", venc: "27 jun 2026", vencISO: "2026-06-27", valor: 22100000, estado: "vigente" },
-  { id: "FVE-44655", venc: "02 jun 2026", vencISO: "2026-06-02", valor: 7300000, estado: "vencida" },
+  { id: "FVE-44821", emision: "21 may 2026", emisionISO: "2026-05-21", venc: "11 jun 2026", vencISO: "2026-06-11", valor: 18420000, estado: "porvencer" },
+  { id: "FVE-44780", emision: "19 may 2026", emisionISO: "2026-05-19", venc: "18 jun 2026", vencISO: "2026-06-18", valor: 12750000, estado: "vigente" },
+  { id: "FVE-44712", emision: "06 may 2026", emisionISO: "2026-05-06", venc: "05 jun 2026", vencISO: "2026-06-05", valor: 9680000, estado: "vencida" },
+  { id: "FVE-44698", emision: "28 may 2026", emisionISO: "2026-05-28", venc: "27 jun 2026", vencISO: "2026-06-27", valor: 22100000, estado: "vigente" },
+  { id: "FVE-44655", emision: "03 may 2026", emisionISO: "2026-05-03", venc: "02 jun 2026", vencISO: "2026-06-02", valor: 7300000, estado: "vencida" },
 ];
 const factEstados: Record<FactEstado, EstadoMeta> = {
   vigente: { label: "Vigente", pill: "green" },

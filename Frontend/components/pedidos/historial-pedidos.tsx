@@ -5,6 +5,7 @@ import { Icon } from "@/components/icons";
 import { MP, type EstadoPedido } from "@/lib/data";
 import { Pill } from "@/components/shared/primitives";
 import { FiltroGeneralModal } from "@/components/pedidos/filtro-general-modal";
+import { exportarPedidosExcel } from "@/lib/pedidos/export-pedidos";
 
 type FiltroPedido = "todos" | EstadoPedido;
 
@@ -19,8 +20,19 @@ const FILTROS: { id: FiltroPedido; label: string }[] = [
 export function HistorialPedidos() {
   const [filtro, setFiltro] = useState<FiltroPedido>("todos");
   const [showFilter, setShowFilter] = useState(false);
+  const [exportando, setExportando] = useState(false);
 
   const lista = filtro === "todos" ? MP.pedidos : MP.pedidos.filter((p) => p.estado === filtro);
+
+  const exportar = async () => {
+    if (lista.length === 0 || exportando) return;
+    setExportando(true);
+    try {
+      await exportarPedidosExcel(lista);
+    } finally {
+      setExportando(false);
+    }
+  };
 
   return (
     <div className="card">
@@ -29,6 +41,9 @@ export function HistorialPedidos() {
         <div className="spacer" />
         <div className="search"><Icon.search /><input placeholder="Buscar por Cod, PVC u OC…" /></div>
         <button className="btn btn-ghost btn-sm" onClick={() => setShowFilter(true)}><Icon.filter /> Filtro general</button>
+        <button className="btn btn-quiet btn-sm" onClick={exportar} disabled={lista.length === 0 || exportando}>
+          <Icon.sheet /> {exportando ? "Exportando…" : "Exportar a Excel"}
+        </button>
       </div>
       <div style={{ padding: "8px 20px 0" }}>
         <div className="tabs" style={{ marginBottom: 0 }}>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Icon } from "@/components/icons";
 import { MP } from "@/lib/data";
 import { Pill } from "@/components/shared/primitives";
+import { exportarCarteraExcel } from "@/lib/pagos/export-cartera";
 
 export function EstadoCartera() {
   const [q, setQ] = useState("");
@@ -18,6 +19,17 @@ export function EstadoCartera() {
       )
     : MP.solicitudes;
 
+  const [exportando, setExportando] = useState(false);
+  const exportar = async () => {
+    if (lista.length === 0 || exportando) return;
+    setExportando(true);
+    try {
+      await exportarCarteraExcel(lista);
+    } finally {
+      setExportando(false);
+    }
+  };
+
   return (
     <>
       <div className="card-head" style={{ borderBottom: "none", paddingBottom: 4 }}>
@@ -27,6 +39,9 @@ export function EstadoCartera() {
           <Icon.search />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por N.º, proceso o recaudo…" />
         </div>
+        <button className="btn btn-quiet btn-sm" onClick={exportar} disabled={lista.length === 0 || exportando}>
+          <Icon.sheet /> {exportando ? "Exportando…" : "Exportar a Excel"}
+        </button>
       </div>
       <div className="tbl-wrap">
         <table className="tbl">

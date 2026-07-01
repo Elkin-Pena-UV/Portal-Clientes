@@ -4,6 +4,7 @@ import { useState, type Dispatch, type SetStateAction } from "react";
 import { Icon } from "@/components/icons";
 import { MP, type Factura } from "@/lib/data";
 import { Pill, Checkbox } from "@/components/shared/primitives";
+import { exportarFacturasExcel } from "@/lib/pagos/export-facturas";
 
 export function PagarFacturas({ sel, setSel, montos, setMontos }: {
   sel: Record<string, boolean>;
@@ -24,6 +25,20 @@ export function PagarFacturas({ sel, setSel, montos, setMontos }: {
     (hasta ? f.vencISO <= hasta : true)
   );
   const allOn = lista.length > 0 && lista.every((f) => sel[f.id]);
+
+  const [exportando, setExportando] = useState(false);
+  const seleccionadas = MP.facturas.filter((f) => sel[f.id]);
+  const exportar = async () => {
+    if (seleccionadas.length === 0 || exportando) return;
+    setExportando(true);
+    try {
+      await exportarFacturasExcel(
+        seleccionadas.map((f) => ({ factura: f, seleccionada: true, montoPagar: montoDe(f) }))
+      );
+    } finally {
+      setExportando(false);
+    }
+  };
 
   const toggle = (id: string) => setSel((s) => ({ ...s, [id]: !s[id] }));
   const toggleAll = () => {
@@ -53,13 +68,16 @@ export function PagarFacturas({ sel, setSel, montos, setMontos }: {
         {(q || desde || hasta) && (
           <button className="btn btn-quiet btn-sm" onClick={() => { setQ(""); setDesde(""); setHasta(""); }}><Icon.x /> Limpiar</button>
         )}
+        <button className="btn btn-quiet btn-sm" onClick={exportar} disabled={seleccionadas.length === 0 || exportando}>
+          <Icon.sheet /> {exportando ? "Exportando…" : "Exportar a Excel"}
+        </button>
       </div>
 
       <div className="tbl-wrap" style={{ borderTop: "1px solid var(--line)" }}>
         <table className="tbl">
           <thead><tr>
             <th style={{ width: 44 }}><Checkbox on={allOn} onClick={toggleAll} /></th>
-            <th>N.º factura</th><th>Vencimiento</th><th className="num">Saldo</th>
+            <th>N.º factura</th><th>Fecha factura</th><th>Vencimiento</th><th className="num">Saldo (con IVA)</th>
             <th className="num" style={{ width: 180 }}>Monto a pagar</th><th>Estado</th>
           </tr></thead>
           <tbody>
@@ -67,6 +85,7 @@ export function PagarFacturas({ sel, setSel, montos, setMontos }: {
               <tr key={f.id} style={sel[f.id] ? { background: "var(--orange-light)" } : undefined}>
                 <td><Checkbox on={!!sel[f.id]} onClick={() => toggle(f.id)} /></td>
                 <td className="t-strong t-mono">{f.id}</td>
+                <td className="t-muted">{f.emision}</td>
                 <td className="t-muted">{f.venc}</td>
                 <td className="num t-mono">{MP.COP(f.valor)}</td>
                 <td className="num">
