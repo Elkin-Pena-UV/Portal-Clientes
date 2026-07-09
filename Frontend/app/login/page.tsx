@@ -4,23 +4,32 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/icons";
 import { MP } from "@/lib/data";
+import { MA } from "@/lib/admin/data";
 import { MLogo } from "@/components/shared/primitives";
-import { useAuth } from "@/contexts/auth";
+import { useAuth, type Rol } from "@/contexts/auth";
+
+const HOME: Record<Rol, string> = { cliente: "/inicio", admin: "/admin" };
 
 export default function LoginPage() {
   const router = useRouter();
-  const { authed, ready, login } = useAuth();
+  const { authed, ready, rol, login } = useAuth();
+  const [tipo, setTipo] = useState<Rol>("cliente");
   const [email, setEmail] = useState("mrestrepo@constpacifico.co");
   const [pass, setPass] = useState("••••••••••");
 
   useEffect(() => {
-    if (ready && authed) router.replace("/inicio");
-  }, [ready, authed, router]);
+    if (ready && authed) router.replace(HOME[rol ?? "cliente"]);
+  }, [ready, authed, rol, router]);
+
+  function cambiarTipo(t: Rol) {
+    setTipo(t);
+    setEmail(t === "admin" ? MA.adminUser.correo : "mrestrepo@constpacifico.co");
+  }
 
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    login();
-    router.replace("/inicio");
+    login(tipo);
+    router.replace(HOME[tipo]);
   }
 
   return (
@@ -46,7 +55,16 @@ export default function LoginPage() {
         <form className="lf-inner" onSubmit={submit}>
           <h1>Inicia sesión</h1>
           <p className="lf-sub">Ingresa con las credenciales de tu empresa.</p>
-          <div className="lf-demo"><Icon.info />Prototipo de demostración — pulsa “Ingresar” para entrar al portal.</div>
+          <div className="tabs" style={{ marginBottom: 18 }}>
+            <button type="button" className={"tab" + (tipo === "cliente" ? " on" : "")} onClick={() => cambiarTipo("cliente")}>Cliente</button>
+            <button type="button" className={"tab" + (tipo === "admin" ? " on" : "")} onClick={() => cambiarTipo("admin")}>Administrador</button>
+          </div>
+          <div className="lf-demo">
+            <Icon.info />
+            {tipo === "admin"
+              ? "Prototipo de demostración — pulsa “Ingresar” para entrar al portal administrativo."
+              : "Prototipo de demostración — pulsa “Ingresar” para entrar al portal."}
+          </div>
           <div className="field">
             <label>Correo corporativo</label>
             <input className="input" value={email} onChange={(e) => setEmail(e.target.value)} />

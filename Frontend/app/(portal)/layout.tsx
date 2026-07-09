@@ -27,7 +27,7 @@ const TITLES: Record<string, TitleMeta> = {
 };
 
 export default function PortalLayout({ children }: { children: ReactNode }) {
-  const { authed, ready, logout } = useAuth();
+  const { authed, ready, rol, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
@@ -38,8 +38,10 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (ready && !authed) router.replace("/login");
-  }, [ready, authed, router]);
+    if (!ready) return;
+    if (!authed) router.replace("/login");
+    else if (rol === "admin") router.replace("/admin");
+  }, [ready, authed, rol, router]);
 
   // Cierra el drawer móvil al cambiar de ruta
   useEffect(() => {
@@ -58,7 +60,7 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
     router.replace("/login");
   }
 
-  if (!ready || !authed) return null;
+  if (!ready || !authed || rol === "admin") return null;
 
   const seg = pathname.split("/")[1] || "inicio";
   const meta = TITLES[seg] || TITLES.inicio;
