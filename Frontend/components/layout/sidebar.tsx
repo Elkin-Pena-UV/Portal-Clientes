@@ -5,19 +5,27 @@ import { Icon, type IconName } from "@/components/icons";
 import { MP } from "@/lib/data";
 import { MLogo } from "@/components/shared/primitives";
 
-interface NavItem {
+export interface NavItem {
   id: string;
   label: string;
   icon: IconName;
   badge?: number;
+  /** Marca activo solo con coincidencia exacta de ruta (útil para el dashboard). */
+  exact?: boolean;
 }
 
-interface NavGroup {
+export interface NavGroup {
   group: string;
   items: NavItem[];
 }
 
-const NAV: NavGroup[] = [
+export interface SidebarUser {
+  iniciales: string;
+  nombre: string;
+  detalle: string;
+}
+
+const NAV_CLIENTE: NavGroup[] = [
   { group: "Principal", items: [
     { id: "inicio", label: "Inicio", icon: "home" },
   ]},
@@ -36,11 +44,20 @@ const NAV: NavGroup[] = [
   ]},
 ];
 
-export function Sidebar({ collapsed, onToggle, onLogout, onNavigate }: {
+const USER_CLIENTE: SidebarUser = {
+  iniciales: MP.cliente.iniciales,
+  nombre: MP.cliente.usuario,
+  detalle: MP.cliente.rol + " · " + MP.cliente.razon.split(" ")[0],
+};
+
+export function Sidebar({ collapsed, onToggle, onLogout, onNavigate, nav = NAV_CLIENTE, subtitle = "Portal de clientes", user = USER_CLIENTE }: {
   collapsed: boolean;
   onToggle: () => void;
   onLogout: () => void;
   onNavigate?: () => void;
+  nav?: NavGroup[];
+  subtitle?: string;
+  user?: SidebarUser;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -49,19 +66,19 @@ export function Sidebar({ collapsed, onToggle, onLogout, onNavigate }: {
     <aside className="sidebar">
       <div className="sb-brand">
         <div className="sb-logo"><MLogo /></div>
-        <div className="name">San Marcos<small>Portal de clientes</small></div>
+        <div className="name">San Marcos<small>{subtitle}</small></div>
         <button className="sb-toggle" onClick={onToggle} title={collapsed ? "Expandir menú" : "Colapsar menú"} aria-label="Colapsar menú">
           {collapsed ? <Icon.chevR /> : <Icon.chevL />}
         </button>
       </div>
       <nav className="sb-nav">
-        {NAV.map((g) => (
+        {nav.map((g) => (
           <div className="sb-group" key={g.group}>
             <div className="sb-group-label">{g.group}</div>
             {g.items.map((it) => {
               const Ic = Icon[it.icon];
               const base = "/" + it.id;
-              const active = pathname === base || pathname.startsWith(base + "/");
+              const active = pathname === base || (!it.exact && pathname.startsWith(base + "/"));
               return (
                 <button
                   key={it.id}
@@ -79,10 +96,10 @@ export function Sidebar({ collapsed, onToggle, onLogout, onNavigate }: {
         ))}
       </nav>
       <div className="sb-user">
-        <div className="avatar">{MP.cliente.iniciales}</div>
+        <div className="avatar">{user.iniciales}</div>
         <div className="meta">
-          <b>{MP.cliente.usuario}</b>
-          <span>{MP.cliente.rol} · {MP.cliente.razon.split(" ")[0]}</span>
+          <b>{user.nombre}</b>
+          <span>{user.detalle}</span>
         </div>
         <button className="logout" onClick={onLogout} title="Cerrar sesión"><Icon.logout /></button>
       </div>

@@ -106,6 +106,7 @@ export const Icon = (function () {
       React.createElement("path", { d: "M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3", key: "b" }),
     ]),
     drop: P("M12 3s6 6.5 6 10.5a6 6 0 0 1-12 0C6 9.5 12 3 12 3Z"),
+    sliders: P("M4 8h9", "M17 8h3", "M15 5v6", "M4 16h3", "M11 16h9", "M9 13v6"),
   };
 })();
 
